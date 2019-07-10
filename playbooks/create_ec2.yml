@@ -1,0 +1,71 @@
+- name: To create ec2 instance
+  hosts: localhost
+  gather_facts: yes
+  pre_tasks:
+    - name: read SG
+      command: "redis-cli get sg_id"
+      register: redis_sg
+    - name: read subnet ID
+      command: "redis-cli get subnet_id"
+      register: redis_subnet
+    - name: read vpc ID
+      command: "redis-cli get vpc_id"
+      register: redis_vpc
+    - name: set VPC facts
+      set_fact:
+        public_sg_id:     "{{ redis_sg.stdout }}"
+        public_subnet_id: "{{ redis_subnet.stdout }}"
+        vpc_id:           "{{ redis_vpc.stdout }}"
+        aws_access_key:   "{{ lookup('env','aws_access_key_id') }}"
+        aws_secret_key:   "{{ lookup('env','aws_secret_access_key') }}"
+        your_name:        "{{ lookup('env','your_name') }}"
+        your_email:       "{{ lookup('env','your_email') }}"
+        aws_region:       "{{ lookup('env','aws_region') }}"
+        aws_ami:          "{{ lookup('env','aws_ami') }}"
+        aws_iam_role:     "{{ lookup('env','iam_role') }}"
+  vars:
+    keypair: "test_amir"
+    instance_type: "t2.micro"
+    volume_size: 10
+  tasks:
+    - name: Create ec2 instance
+      ec2:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        key_name: "{{ keypair }}"
+        instance_type: "{{ instance_type }}"
+        group_id: "{{ public_sg_id }}"
+        image: "{{ aws_ami }}"
+        wait: true
+        region: "{{ aws_region }}"
+        exact_count: 1 
+        instance_profile_name: "{{ aws_iam_role }}" # the role for the ec2 instances
+        instance_initiated_shutdown_behavior: terminate
+        # The following commented for next modifications
+        # volumes:
+        # - device_name: /dev/xvda
+        #   volume_type: gp2
+        #   volume_size: "{{ volume_size }}"
+        #   delete_on_termination: yes
+        count_tag:
+          Name: "Amir"
+        instance_tags:
+          Name: "{{ your_name  }}"
+        vpc_subnet_id: "{{ public_subnet_id }}"        
+        assign_public_ip: yes # yes: only available with vpc_subnet_id
+      register: ec2instance
+    - debug: msg="{{ ec2instance }}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
