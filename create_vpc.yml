@@ -1,0 +1,21 @@
+- name: Create a vpc for user
+  hosts: localhost
+  gather_facts: yes
+  pre_tasks:
+    - name: get my ip address
+      ipify_facts:
+      register: my_ip_address
+  vars:
+    aws_access_key: "{{ lookup('env','aws_access_key_id') }}"
+    aws_secret_key: "{{ lookup('env','aws_secret_access_key') }}"
+    your_name:      "{{ lookup('env','your_name') }}"
+    your_email:     "{{ lookup('env','your_email') }}"
+    aws_region:     "{{ lookup('env','aws_region') }}"
+    vpc_cidr_block: "10.0.0.0/16"
+    # For Security Group Rule -- commented for now
+    my_ip:          "{{ipify_public_ip}}" 
+    # Subnets: make sure these makes sense --> amir
+    public_subnet_1_cidr:  "10.0.0.0/24"
+    private_subnet_1_cidr: "10.0.1.0/24"
+  roles: 
+    - vpc
