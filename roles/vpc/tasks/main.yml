@@ -1,0 +1,128 @@
+---
+# thanks to http://jeremievallee.com/2016/07/27/aws-vpc-ansible/ 
+
+- name:               Create VPC
+  ec2_vpc_net:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    name:             "vpc-{{ your_name }}"
+    cidr_block:       "{{ vpc_cidr_block }}"
+    region:           "{{ aws_region }}"
+    tags:
+      your_name:      "{{ your_name }}"
+      your_email:     "{{ your_email }}"
+    state:            "present"
+  register: my_vpc
+
+# get the vpc_id
+- name:               Set VPC ID in variable
+  set_fact:
+    vpc_id:           "{{ my_vpc.vpc.id }}"
+
+- debug:
+    msg: "{{ vpc_id }}"
+
+# Note: that the availabilty zone should be something in the form of 
+# {{ aws_region }}a-c
+- name:               Create Public Subnet 
+  ec2_vpc_subnet:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    state:            "present"
+    vpc_id:           "{{ vpc_id }}"
+    cidr:             "{{ public_subnet_1_cidr }}"
+    az:               "{{ aws_region }}a"
+    region:           "{{ aws_region }}"
+    resource_tags:
+      Name:           "Public_Subnet_{{ your_name }}"
+  register: my_public_subnet
+
+- name:               Set Public Subnet ID in variable
+  set_fact:
+    public_subnet_id: "{{ my_public_subnet.subnet.id }}"
+
+- name: Setup AWS CLI (1/1)
+  shell: >
+    aws configure set region {{ aws_region }}
+
+# We pause a few seconds for the NAT Gateway to be ready.
+- pause: seconds=5
+
+- name:               Create Internet Gateway for VPC
+  ec2_vpc_igw:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    vpc_id:           "{{ vpc_id }}"
+    region:           "{{ aws_region }}"
+    state:            "present"
+  register: my_vpc_igw
+
+- name:               Set Internet Gateway ID in variable
+  set_fact:
+    igw_id:           "{{ my_vpc_igw.gateway_id }}"
+
+- name: Set up public subnet route table
+  ec2_vpc_route_table:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ aws_region }}"
+    tags:
+      Name: "Public-{{ your_name }}"
+    subnets:
+      - "{{ public_subnet_id }}"
+    routes:
+      - dest: "0.0.0.0/0"
+        gateway_id: "{{ igw_id }}"
+
+# Finally, let's create the Security Groups.
+# We will create two : one to attach to public instances,
+# and one to attach to private instances.
+
+- name: Create Main Security Group
+  ec2_group:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    name: "{{ your_name }}SG"
+    description: "can ssh from your local machines publich ip + all open between routes"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ aws_region }}"
+  register: my_main_sg
+
+- name: Set securtiy group rules
+  ec2_group:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    name: "{{ your_name }}SG"
+    description: "can ssh from your local machine"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ aws_region }}"
+    rules:
+      # This part is commented for now 
+      # but later on if more security needed
+      # can be activated
+      # - proto: "tcp"
+      #   from_port: "22"
+      #   to_port: "22"
+      #   cidr_ip: "{{ my_ip }}/32"
+      - proto: "all"
+        group_id: "{{ my_main_sg.group_id }}"
+
+- name: Set Main SG ID
+  set_fact:
+    main_sg_id: "{{ my_main_sg.group_id }}"
+
+- name: Prepare variables for database
+  blockinfile:
+    path: '/tmp/redis_data'
+    create: yes
+    block: |
+      set sg_id {{ my_main_sg.group_id }}
+      set subnet_id {{ public_subnet_id }}
+      set vpc_id {{ vpc_id }}
+
+- name: Push data to Redis DB
+  shell: "{{ item }}"
+  with_items:
+    - "cat /tmp/redis_data | redis-cli"
+    # - rm -rf /tmp/redis_data
