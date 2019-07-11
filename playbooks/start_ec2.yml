@@ -90,6 +90,7 @@
       command: "{{ item }}"
       with_items:
         - "redis-cli sadd running_instances {{ ec2_name }}"
+        - "redis-cli rpush {{ ec2_name }} {{ ec2_id }}"
         - "redis-cli rpush {{ ec2_name }} {{ ec2_public_ip }}"
         - "redis-cli rpush {{ ec2_name }} {{ aws_region }}"
     
