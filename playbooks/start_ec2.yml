@@ -87,7 +87,12 @@
           {{ ec2_name }} ansible_ssh_host={{ ec2_public_ip }} ansible_user=ubuntu ansible_ssh_private_key=/home/sandbox/.ssh/test_amir.pem
 
     - name: add to redis running instances
-      command: "redis-cli sadd running_instances {{ ec2_name }}"
+      command: "{{ item }}"
+      with_items:
+        - "redis-cli sadd running_instances {{ ec2_name }}"
+        - "redis-cli rpush {{ ec2_name }} {{ ec2_public_ip }}"
+        - "redis-cli rpush {{ ec2_name }} {{ aws_region }}"
+    
     
 
 
