@@ -20,4 +20,4 @@ def get_box_name(available_names, created_instances):
     return boxn
         
 if __name__ == "__main__":
-    get_box_name('available_names', 'created_instances')
+    print (get_box_name('available_names', 'created_instances'))
