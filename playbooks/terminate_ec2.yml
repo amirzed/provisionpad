@@ -2,17 +2,19 @@
   hosts: localhost
   gather_facts: yes
   pre_tasks:
+    - name: set instance facts
+      set_fact:
+        instance_name       :  "{{ lookup('env', 'instance_name') }}"
     - name: read instance id
-      command: "redis-cli lindex box3 0"
+      command: "redis-cli lindex {{ instance_name }} 0"
       register: redis_instance_id
     - name: read instance region
-      command: "redis-cli lindex box3 2"
+      command: "redis-cli lindex {{ instance_name }} 2"
       register: redis_instance_region
     - name: set instance facts
       set_fact:
         instance_id:     "{{ redis_instance_id.stdout }}"
         instance_region: "{{ redis_instance_region.stdout }}"
-        instance_name       :  "{{ lookup('env', 'instance_name') }}"
   tasks:
     - name: Terminate the instance
       local_action:

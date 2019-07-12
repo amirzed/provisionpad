@@ -14,7 +14,10 @@ r = redis.Redis(
 def terminate_instance(instance_name):
     os.environ['instance_name'] = instance_name
     ansible_file = os.path.join(repo_dir,'playbooks/terminate_ec2.yml')    
-    os.system(' '.join(['ansible-playbook', ansible_file]))
+    outos = os.system(' '.join(['ansible-playbook', ansible_file]))
+    if outos != 0:
+        print ('something went wron check it')
+        sys.exit()
     r.srem('running_instances', instance_name)
     if instance_name[:3] == 'box':
         r.rpush('available_names', instance_name)
