@@ -24,17 +24,19 @@
         aws_ami:          "{{ lookup('env','aws_ami') }}"
         aws_iam_role:     "{{ lookup('env','iam_role') }}"
         repository_home:  "{{ lookup('env', 'repo_home_dir') }}"
-  vars:
-    keypair: "test_amir"
-    instance_type: "t2.micro"
-    # volume_size: 10
+        keypair        :  "{{ lookup('env', 'keypair') }}"
+        keypath        :  "{{ lookup('env', 'my_ssh_key') }}"
+        box_type       :  "{{ lookup('env', 'boxtype') }}"
+        box_name       :  "{{ lookup('env', 'boxname') }}"
+        env_var_dir    :  "{{ lookup('env', 'env_var_dir') }}"
+        home_dir       :  "{{ lookup('env', 'my_home_folder') }}"
   tasks:
     - name: Create ec2 instance
       ec2:
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         key_name: "{{ keypair }}"
-        instance_type: "{{ instance_type }}"
+        instance_type: "{{ box_type }}"
         group_id: "{{ public_sg_id }}"
         image: "{{ aws_ami }}"
         wait: true
@@ -56,35 +58,35 @@
         assign_public_ip: yes # yes: only available with vpc_subnet_id
       register: ec2instance
 
-    - name: get instance name
-      command: python {{ repository_home }}/pythonscripts/boxno.py
-      register: boxno
+    # - name: get instance name
+    #   command: python {{ repository_home }}/pythonscripts/boxno.py
+    #   register: boxno
 
     - name: set ec2 facts
       set_fact:
         ec2_id: "{{ ec2instance.instance_ids[0] }}"
-        ec2_name:      "{{ boxno.stdout }}"
+        ec2_name:      "{{ box_name }}"
         ec2_public_ip: "{{ ec2instance.instances[0].public_ip }}"
 
     - name: Add to ssh config
       blockinfile:
-        path: '/home/sandbox/.ssh/config'
+        path: '{{ home_dir }}/.ssh/config'
         create: yes
         marker: "## {mark} intsnace {{ ec2_name }}"
         block: |
           Host {{ ec2_name }}
             HostName {{ ec2_public_ip }}
             User ubuntu
-            IdentityFile /home/sandbox/.ssh/test_amir.pem
+            IdentityFile {{ keypath }}
             ForwardAgent yes
 
     - name: Add to ansible inventory
       blockinfile:
-        path: '/home/sandbox/env_variables/inventory'
+        path: '{{ env_var_dir }}/inventory'
         create: yes
         marker: "## {mark} intsnace {{ ec2_name }}"
         block: |
-          {{ ec2_name }} ansible_ssh_host={{ ec2_public_ip }} ansible_user=ubuntu ansible_ssh_private_key=/home/sandbox/.ssh/test_amir.pem
+          {{ ec2_name }} ansible_ssh_host={{ ec2_public_ip }} ansible_user=ubuntu ansible_ssh_private_key={{ keypath }}
 
     - name: add to redis running instances
       command: "{{ item }}"
