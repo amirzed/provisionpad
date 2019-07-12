@@ -1,0 +1,44 @@
+- name: Terminate ec2 instance
+  hosts: localhost
+  gather_facts: yes
+  pre_tasks:
+    - name: read instance id
+      command: "redis-cli lindex box3 0"
+      register: redis_instance_id
+    - name: read instance region
+      command: "redis-cli lindex box3 2"
+      register: redis_instance_region
+    - name: set instance facts
+      set_fact:
+        instance_id:     "{{ redis_instance_id.stdout }}"
+        instance_region: "{{ redis_instance_region.stdout }}"
+  tasks:
+    - name: Terminate the instance
+      local_action:
+        module: ec2
+        state: 'absent'
+        region: "{{ instance_region }}"
+        instance_ids: '{{ instance_id }}'
+    - name: remove from 
+      command: "{{ item }}"
+      with_items:
+        - "redis-cli srem running_instances box3"
+        - "redis-cli rpush available_names box3"
+        - "redis-cli del box3"
+
+    - name: Add to ssh config
+      blockinfile:
+        path: '/home/sandbox/.ssh/config'
+        create: yes
+        marker: "## {mark} intsnace box3"
+        block: |
+          
+    - name: Add to ansible inventory
+      blockinfile:
+        path: '/home/sandbox/env_variables/inventory'
+        create: yes
+        marker: "## {mark} intsnace box3"
+        block: |
+          
+  
+

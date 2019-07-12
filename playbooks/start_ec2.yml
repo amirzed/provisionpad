@@ -27,7 +27,7 @@
   vars:
     keypair: "test_amir"
     instance_type: "t2.micro"
-    volume_size: 10
+    # volume_size: 10
   tasks:
     - name: Create ec2 instance
       ec2:
