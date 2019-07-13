@@ -11,7 +11,7 @@ def get_box_name(available_names, created_instances):
     newly created instance
     """
     nval = r.lpop(available_names)
-    if nval is not None:
+    if nval is not None and nval.decode('utf-8') not in runnin_instances:
         boxn = nval.decode('utf-8')
     else:
         boxi = int(r.get(created_instances)) + 1
