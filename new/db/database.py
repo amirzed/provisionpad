@@ -17,3 +17,5 @@ def load_database():
     else: # used for initializing the database
         return initiate_db
 
+def save_database(database):
+    pickle.dump( database, open( database_name, 'wb' ) )
