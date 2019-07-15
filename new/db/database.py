@@ -1,6 +1,7 @@
 import os
 import sys
 import pickle
+from collections import deque
 env_var_dir = os.environ['env_var_dir']
 sys.path.append(env_var_dir)
 database_name = os.path.join(env_var_dir, 'database.p')
@@ -8,6 +9,9 @@ database_name = os.path.join(env_var_dir, 'database.p')
 def initiate_db():
     print('initiating the database')
     database = {'created_instances': 0}
+    database['available_names'] = deque()
+    database['running_instances'] = set([])
+    database['stopped_instances'] = set([])
     pickle.dump( database, open( database_name, 'wb' ) )
     return database
 
