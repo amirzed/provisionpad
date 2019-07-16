@@ -38,11 +38,6 @@ def start_instance(boxname, boxtype, DB):
     secret_key = os.environ['aws_secret_access_key']
     awsf = AWSec2Funcs(region, access_key, secret_key)
 
-    # isntances_info = awsf.ec2Client.describe_instances()['Reservations']
-    # for x in isntances_info:
-    #     for y in x['Instances']:
-    #         print (y['InstanceId'])
-
     my_ssh_key_path = os.environ['my_ssh_key']
     ssh_key_name = my_ssh_key_path.strip().rsplit('/', 1)[-1].split('.')[0]
 
