@@ -60,9 +60,9 @@ def start_instance(boxname, boxtype, DB):
     params['box_type'] = boxtype
     params['name'] = os.environ['your_name'].replace(" ", "")+boxname
 
-    DB[boxname] = awsf.create_ec2_instance(params)
-    DB['running_instances'].add(boxname)
-    print (DB['running_instances'])
+    # DB[boxname] = awsf.create_ec2_instance(params)
+    DB['running_instances'][boxname] = awsf.create_ec2_instance(params)
+    print (DB)
     write_into_text(boxname,
 '''
 Host {0}
@@ -70,7 +70,7 @@ Host {0}
     User ubuntu
     IdentityFile {2}
     ForwardAgent yes
-'''.format(boxname, DB[boxname]['public_ip'], my_ssh_key_path), 
+'''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path), 
 os.path.join(home_folder,'.ssh/config'))
     save_database(DB)
 

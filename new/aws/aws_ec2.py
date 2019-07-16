@@ -107,6 +107,11 @@ class AWSec2Funcs:
         response = self.ec2Client.describe_instances()['Reservations']
         return self.get_instance_info(instances[0].id, response)
 
+    def terminate_ec2_instance(self, id):
+        ids = [id,]
+        instances = self.ec2.instances.filter(InstanceIds=ids).terminate()
+        # print (instances)
+        # instances.wait_until_terminated()
 
 
 # # Boto 3

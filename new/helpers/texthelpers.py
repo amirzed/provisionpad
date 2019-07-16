@@ -14,14 +14,15 @@ def write_into_text(marker, text, filetowrite):
     if not os.path.isfile(filetowrite):
         with open(filetowrite, 'w+') as f:
             f.write(
-            '### PROVISIONPAD {0}\n{1}\n### PROVISIONPAD {0}\n'
+            '### PROVISIONPAD {0}\n{1}\n### PROVISIONPAD {0}\n'.format(
+                marker, text.strip())
             )
     else:
         with open(filetowrite, 'r') as f:
             textfile = f.read()
         with open(filetowrite, 'a+') as f:
             if len(re.findall(pattern, textfile, flags=re.DOTALL))>0:
-                print('something wrong fix it')
+                print('something wrong fix it (write_into_text)')
                 sys.exit()
             f.write(
             '\n### PROVISIONPAD {0}\n{1}\n### PROVISIONPAD {0}\n'.format(

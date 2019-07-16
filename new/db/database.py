@@ -10,8 +10,8 @@ def initiate_db():
     print('initiating the database')
     database = {'created_instances': 0}
     database['available_names'] = deque()
-    database['running_instances'] = set([])
-    database['stopped_instances'] = set([])
+    database['running_instances'] = {}
+    database['stopped_instances'] = {}
     pickle.dump( database, open( database_name, 'wb' ) )
     return database
 
