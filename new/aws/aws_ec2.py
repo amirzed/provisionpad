@@ -58,3 +58,97 @@ class AWSec2Funcs:
  
         return vpctuple
 
+    def get_instance_info(self,id, instances_info):
+        rdict = {}
+        for x in instances_info:
+            for y in x['Instances']:
+                if y['InstanceId']== id:
+                    rdict['id'] = id
+                    rdict['launch_time'] = y['LaunchTime']
+                    rdict['type'] = y['InstanceType']
+                    rdict['public_dns'] = y['PublicDnsName']
+                    rdict['public_ip'] = y['PublicIpAddress']
+                    rdict['private_dns'] = y['PrivateDnsName']
+                    rdict['private_ip'] = y['PrivateIpAddress']
+                    break
+        return rdict
+
+    def create_ec2_instance(self, params):
+
+        instances = self.ec2.create_instances(
+                        ImageId=params['aws_ami'],
+                        InstanceType=params['box_type'],
+                        MaxCount=1,
+                        MinCount=1,
+                        NetworkInterfaces=[{
+                            'SubnetId': params['vpc']['subnet_id'],
+                            'Groups': [params['vpc']['sg_id'],],
+                            'DeviceIndex': 0,
+                            'AssociatePublicIpAddress': True,
+                        }],
+                        TagSpecifications=[
+                            {
+                                'ResourceType': 'instance',
+                                'Tags': [
+                                    {
+                                        'Key': 'Name',
+                                        'Value': params['name']
+                                    },
+                                ]
+                            },
+                        ],
+                        IamInstanceProfile={
+                            # 'Arn': 'string',
+                            'Name': params['aws_iam_role']
+                        },
+                        KeyName=params['ssh_key_name'])
+
+        instances[0].wait_until_running()
+        response = self.ec2Client.describe_instances()['Reservations']
+        return self.get_instance_info(instances[0].id, response)
+
+
+
+# # Boto 3
+# ec2.instances.filter(InstanceIds=ids).stop()
+# ec2.instances.filter(InstanceIds=ids).terminate()
+
+# import sys
+# import boto3
+# from botocore.exceptions import ClientError
+
+# instance_id = sys.argv[2]
+# action = sys.argv[1].upper()
+
+# ec2 = boto3.client('ec2')
+
+
+# if action == 'ON':
+#     # Do a dryrun first to verify permissions
+#     try:
+#         ec2.start_instances(InstanceIds=[instance_id], DryRun=True)
+#     except ClientError as e:
+#         if 'DryRunOperation' not in str(e):
+#             raise
+
+#     # Dry run succeeded, run start_instances without dryrun
+#     try:
+#         response = ec2.start_instances(InstanceIds=[instance_id], DryRun=False)
+#         print(response)
+#     except ClientError as e:
+#         print(e)
+# else:
+#     # Do a dryrun first to verify permissions
+#     try:
+#         ec2.stop_instances(InstanceIds=[instance_id], DryRun=True)
+#     except ClientError as e:
+#         if 'DryRunOperation' not in str(e):
+#             raise
+
+#     # Dry run succeeded, call stop_instances without dryrun
+#     try:
+#         response = ec2.stop_instances(InstanceIds=[instance_id], DryRun=False)
+#         print(response)
+#     except ClientError as e:
+#         print(e)
+
