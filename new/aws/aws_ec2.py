@@ -104,6 +104,7 @@ class AWSec2Funcs:
                         KeyName=params['ssh_key_name'])
 
         instances[0].wait_until_running()
+        print (instances[0])
         response = self.ec2Client.describe_instances()['Reservations']
         return self.get_instance_info(instances[0].id, response)
 
@@ -112,6 +113,21 @@ class AWSec2Funcs:
         instances = self.ec2.instances.filter(InstanceIds=ids).terminate()
         # print (instances)
         # instances.wait_until_terminated()
+
+    def stop_ec2_instance(self, id):
+        ids = [id,]
+        instances = self.ec2.instances.filter(InstanceIds=ids).stop()
+        print (instances)
+        # instances.wait_until_terminated()
+
+    def start_ec2_instance(self, id):
+        ids = [id,]
+        instances = self.ec2.instances.filter(InstanceIds=ids).start()
+        self.ec2.Instance(id=id).wait_until_running()
+        response = self.ec2Client.describe_instances()['Reservations']
+        return self.get_instance_info(id, response)
+        # print (instances)
+        # # instances.wait_until_terminated()
 
 
 # # Boto 3
