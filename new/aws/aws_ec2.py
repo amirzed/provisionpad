@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 repo_dir = os.environ['repo_home_dir']
 sys.path.append(repo_dir)
 
@@ -130,6 +131,24 @@ class AWSec2Funcs:
         response = self.client.describe_instances()['Reservations']
         return self.get_instance_info(id, response)
 
+    def volume_waiter(self, id, state):
+        # for i, x in enumerate(info):
+        #     if x['VolumeId'] == id:
+        #         index = i
+        #         break
+        tw = 0
+        while True:
+            if tw > 60:
+                print ('it is taking too long to make this volume avaialable; volume waiter')
+                sys.exit()
+            info = self.client.describe_volumes()['Volumes']
+            for x in info:
+                if x['VolumeId'] == id:
+                    if x['State'] == state:
+                        return 
+            time.sleep(5)
+            tw += 5
+
     def create_volume(self, params):
         volume = self.ec2.create_volume(
             AvailabilityZone=params['az'],
@@ -151,6 +170,15 @@ class AWSec2Funcs:
                 },
             ]
         )
+        self.volume_waiter(volume.id, 'available')
+        response = volume.attach_to_instance(
+            Device='/dev/xvdh',
+            InstanceId=params['instance_id'],
+            # DryRun=True|False
+        )
+        print (response)
+
+
         
     def get_volume_info(self, id):
         volume_info = self.client.describe_volumes()

@@ -21,12 +21,13 @@ def create_volume(box_name, volume_name, volume_type, volume_size,  DB):
 
     params = {}
     params['az']    = DB['running_instances'][box_name]['az']
+    params['instance_id'] = DB['running_instances'][box_name]['id']
     params['size']  = volume_size
     params['vtype'] = volume_type
     params['name']  = volume_name
 
-    # awsf.create_volume(params) 
-    awsf.get_volume_info('ddd')
+    awsf.create_volume(params) 
+    # awsf.get_volume_info('ddd')
 
 
 if __name__ == "__main__":
