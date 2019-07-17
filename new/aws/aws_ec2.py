@@ -19,7 +19,7 @@ class AWSec2Funcs:
                                 aws_access_key_id=access_key,
                                 aws_secret_access_key=secret_key )
 
-        self.ec2Client = boto3.client('ec2', region_name=region,
+        self.client = boto3.client('ec2', region_name=region,
                                     aws_access_key_id=access_key,
                                     aws_secret_access_key=secret_key )
 
@@ -32,8 +32,8 @@ class AWSec2Funcs:
         vpc.wait_until_available()
 
         # enable public dns hostname so that we can SSH into it later
-        self.ec2Client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsSupport = { 'Value': True } )
-        self.ec2Client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsHostnames = { 'Value': True } )
+        self.client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsSupport = { 'Value': True } )
+        self.client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsHostnames = { 'Value': True } )
 
         # create an internet gateway and attach it to VPC
         internetgateway = self.ec2.create_internet_gateway()
@@ -63,6 +63,7 @@ class AWSec2Funcs:
         for x in instances_info:
             for y in x['Instances']:
                 if y['InstanceId']== id:
+                    print (y)
                     rdict['id'] = id
                     rdict['launch_time'] = y['LaunchTime']
                     rdict['type'] = y['InstanceType']
@@ -70,6 +71,8 @@ class AWSec2Funcs:
                     rdict['public_ip'] = y['PublicIpAddress']
                     rdict['private_dns'] = y['PrivateDnsName']
                     rdict['private_ip'] = y['PrivateIpAddress']
+                    rdict['az'] = y['Placement']['AvailabilityZone'] # az is not me it is availabilityzone :D
+                    rdict['pdrive'] = y['BlockDeviceMappings'][0]['Ebs']['VolumeId']
                     break
         return rdict
 
@@ -105,7 +108,7 @@ class AWSec2Funcs:
 
         instances[0].wait_until_running()
         print (instances[0])
-        response = self.ec2Client.describe_instances()['Reservations']
+        response = self.client.describe_instances()['Reservations']
         return self.get_instance_info(instances[0].id, response)
 
     def terminate_ec2_instance(self, id):
@@ -124,52 +127,33 @@ class AWSec2Funcs:
         ids = [id,]
         instances = self.ec2.instances.filter(InstanceIds=ids).start()
         self.ec2.Instance(id=id).wait_until_running()
-        response = self.ec2Client.describe_instances()['Reservations']
+        response = self.client.describe_instances()['Reservations']
         return self.get_instance_info(id, response)
-        # print (instances)
-        # # instances.wait_until_terminated()
 
-
-# # Boto 3
-# ec2.instances.filter(InstanceIds=ids).stop()
-# ec2.instances.filter(InstanceIds=ids).terminate()
-
-# import sys
-# import boto3
-# from botocore.exceptions import ClientError
-
-# instance_id = sys.argv[2]
-# action = sys.argv[1].upper()
-
-# ec2 = boto3.client('ec2')
-
-
-# if action == 'ON':
-#     # Do a dryrun first to verify permissions
-#     try:
-#         ec2.start_instances(InstanceIds=[instance_id], DryRun=True)
-#     except ClientError as e:
-#         if 'DryRunOperation' not in str(e):
-#             raise
-
-#     # Dry run succeeded, run start_instances without dryrun
-#     try:
-#         response = ec2.start_instances(InstanceIds=[instance_id], DryRun=False)
-#         print(response)
-#     except ClientError as e:
-#         print(e)
-# else:
-#     # Do a dryrun first to verify permissions
-#     try:
-#         ec2.stop_instances(InstanceIds=[instance_id], DryRun=True)
-#     except ClientError as e:
-#         if 'DryRunOperation' not in str(e):
-#             raise
-
-#     # Dry run succeeded, call stop_instances without dryrun
-#     try:
-#         response = ec2.stop_instances(InstanceIds=[instance_id], DryRun=False)
-#         print(response)
-#     except ClientError as e:
-#         print(e)
-
+    def create_volume(self, params):
+        volume = self.ec2.create_volume(
+            AvailabilityZone=params['az'],
+            # Encrypted=True|False,
+            # Iops=123,
+            # KmsKeyId='string',
+            Size=params['size'],
+            # SnapshotId='string',
+            VolumeType=params['vtype']   ,#'standard'|'io1'|'gp2'|'sc1'|'st1',
+            TagSpecifications=[
+                {
+                    'ResourceType': 'volume',
+                    'Tags': [
+                        {
+                            'Key': 'Name',
+                            'Value': params['name']
+                        },
+                    ]
+                },
+            ]
+        )
+        
+    def get_volume_info(self, id):
+        volume_info = self.client.describe_volumes()
+        print (volume_info['Volumes'][0]['Attachments'])
+        print (volume_info['Volumes'][1])
+        print (len(volume_info['Volumes']) )
