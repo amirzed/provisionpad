@@ -12,7 +12,7 @@ def initiate_db():
     database['available_names'] = deque()
     database['running_instances'] = {}
     database['stopped_instances'] = {}
-    pickle.dump( database, open( database_name, 'wb' ) )
+    pickle.dump( database, open( database_name, 'wb' ), protocol=2 )
     return database
 
 def load_database():
@@ -22,4 +22,4 @@ def load_database():
         return initiate_db()
 
 def save_database(database):
-    pickle.dump( database, open( database_name, 'wb' ) )
+    pickle.dump( database, open( database_name, 'wb' ), protocol=2 )
