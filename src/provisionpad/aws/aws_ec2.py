@@ -62,7 +62,6 @@ class AWSec2Funcs:
         for x in instances_info:
             for y in x['Instances']:
                 if y['InstanceId']== id:
-                    print (y)
                     rdict['id'] = id
                     rdict['launch_time'] = y['LaunchTime']
                     rdict['type'] = y['InstanceType']
