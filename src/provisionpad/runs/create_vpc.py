@@ -1,11 +1,8 @@
 import os
 import sys
-repo_dir = os.environ['repo_home_dir']
-sys.path.append(repo_dir)
-from aws.aws_ec2 import AWSec2Funcs
-import redis
-from helpers.namehelpers import vpc_name
-from db.database import load_database, save_database
+from provisionpad.aws.aws_ec2 import AWSec2Funcs
+from provisionpad.helpers.namehelpers import vpc_name
+from provisionpad.db.database import load_database, save_database
 
 def create_vpc():
     DB = load_database()

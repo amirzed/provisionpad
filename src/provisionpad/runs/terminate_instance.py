@@ -1,13 +1,10 @@
 import os
 import sys
-repo_dir = os.environ['repo_home_dir']
-sys.path.append(repo_dir)
-from aws.aws_ec2 import AWSec2Funcs
-from db.database import load_database, save_database
-from helpers.namehelpers import vpc_name
-from helpers.texthelpers import delete_text_from_file
+from provisionpad.aws.aws_ec2 import AWSec2Funcs
+from provisionpad.db.database import load_database, save_database
+from provisionpad.helpers.namehelpers import vpc_name
+from provisionpad.helpers.texthelpers import delete_text_from_file
 
-     
 
 def terminate_instance(boxname, DB):
 

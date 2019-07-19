@@ -1,8 +1,6 @@
 import os
 import sys
 import time
-repo_dir = os.environ['repo_home_dir']
-sys.path.append(repo_dir)
 
 import boto3
 from collections import namedtuple
@@ -108,7 +106,6 @@ class AWSec2Funcs:
                         KeyName=params['ssh_key_name'])
 
         instances[0].wait_until_running()
-        print (instances[0])
         response = self.client.describe_instances()['Reservations']
         return self.get_instance_info(instances[0].id, response)
 
