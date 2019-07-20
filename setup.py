@@ -1,22 +1,49 @@
 
 import sys
+import os
+
+from os.path import expanduser
+home = expanduser("~")
+
+def create_aliases():
+    env_dir = os.path.join(home, '.provisionpad') 
+    if not os.path.isdir(env_dir):
+        os.mkdir(env_dir)
+    if os.path.isfile(os.path.join(env_dir, 'aliases')):
+        thein = input ('It seems you already have aliases'
+                       'Do you want to replace it? (y/n): ')
+        if thein.strip()=='y':
+            os.remove(os.path.join(env_dir, 'aliases'))
+        elif thein.strip() == 'n':
+            return 
+        else:
+            print('Invalid input')
+            sys.exit()
+
+    rootpath = os.path.dirname(os.path.realpath(__file__))
+    thebin = os.path.join(rootpath,'bin/ppad')
+
+    with open(os.path.join(env_dir, 'aliases'), 'w') as f:
+        f.write('alias ppad=\''+thebin+'\'')
+
+
+create_aliases()
+
 try:
     from setuptools import setup, find_packages
-    # from setuptools.command.build_py import build_py as BuildPy
-    # from setuptools.command.install_lib import install_lib as InstallLib
-    # from setuptools.command.install_scripts import install_scripts as InstallScripts
 except ImportError:
     print("Please install setup tools.", file=sys.stderr)
     sys.exit(1)
 
-import os
-thelibFolder = os.path.dirname(os.path.realpath(__file__))
-requirementPath = thelibFolder + '/requirements.txt'
-install_requires = [] # Examples: ["gunicorn", "docutils>=0.3", "lxml==0.5a7"]
-if os.path.isfile(requirementPath):
-    with open(requirementPath) as f:
-        install_requires = f.read().splitlines()
-# setup(name="yourpackage", install_requires=install_requires, [...])
+
+def read_requirements():
+    rootpath = os.path.dirname(os.path.realpath(__file__))
+    requirementPath = os.path.join(rootpath ,'requirements.txt')
+    if os.path.isfile(requirementPath):
+        with open(requirementPath) as f:
+            install_requires = f.read().splitlines()
+    return install_requires
+
 
 static_setup_params = dict(
     name='provisionpad',
@@ -40,10 +67,9 @@ static_setup_params = dict(
     ],
 )
 
-
 def main():
     """Invoke installation process using setuptools."""
-    setup_params = dict(static_setup_params, install_requires=install_requires)
+    setup_params = dict(static_setup_params, install_requires=read_requirements() )
     setup(**setup_params)
 
 if __name__ == '__main__':
