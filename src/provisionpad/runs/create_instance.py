@@ -26,7 +26,7 @@ def get_box_name(DB):
     return boxn
         
 
-def start_instance(boxname, boxtype, DB):
+def create_instance(boxname, boxtype, DB):
 
     DB = load_database()
 
@@ -89,4 +89,4 @@ if __name__ == "__main__":
     boxtype = args.boxtype
 
     DB = load_database()
-    start_instance(boxname, boxtype, DB)
+    create_instance(boxname, boxtype, DB)
