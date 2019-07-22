@@ -123,10 +123,6 @@ def initiate():
         json.dump(env_vars, f, indent=4)
 
 
-# export aws_access_key_id="AKIAJD3I34GBJGGM5DMQ"
-# export aws_secret_access_key="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"
-
-
     # region = os.environ['aws_region']
     # access_key = os.environ['aws_access_key_id']
     # secret_key = os.environ['aws_secret_access_key']
