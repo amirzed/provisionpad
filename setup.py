@@ -32,7 +32,7 @@ static_setup_params = dict(
         'Source Code': 'https://github.com/amirzed/provisionpad',
     },
     license='Apache-2.0',
-    python_requires='>=2.7, >=3.7',
+    # python_requires='>=2.7, >=3.7',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     classifiers=[
