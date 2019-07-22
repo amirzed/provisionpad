@@ -9,6 +9,8 @@ from provisionpad.runs.create_instance import create_instance
 from provisionpad.runs.terminate_instance import terminate_instance
 from provisionpad.runs.stop_instance import stop_instance
 from provisionpad.runs.start_instance import start_instance
+from provisionpad.runs.create_vpc import create_vpc
+from provisionpad.runs.initiate import initiate
 
 parser = argparse.ArgumentParser(description='A function to create instance', 
                                     usage='%(prog)s [OPTIONS]')
@@ -24,7 +26,9 @@ boxname = args.boxname
 boxtype = args.boxtype
 
 
-if command=='create':
+if command=='initiate':
+    initiate()
+elif command=='create':
     print (boxname, boxtype, command)
     DB = load_database()
     create_instance(boxname, boxtype, DB)
