@@ -2,6 +2,7 @@ import platform
 import sys
 import os
 import json
+from builtins import input
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
 from provisionpad.aws.aws_iam import AWSiamFuncs
 from provisionpad.aws.aws_sts import AWSstsFuncs
@@ -18,13 +19,6 @@ def initiate():
     dbpath = os.path.join(env_dir, 'database.p')
     DB = load_database(dbpath)
 
-    # if platform.python_version()[0] == '2':
-    #     input = raw_input
-    try: 
-        raw_input
-        input = raw_input
-    except:
-        pass
 
 
     home = os.path.expanduser("~")
@@ -98,9 +92,11 @@ def initiate():
             print ('creating key pair')
             with open(env_vars['key_pair_path'], 'w') as f:
                 key_pair = str(awsec2f.create_key_pair(key_pair_name))
+                print (key_pair)
                 f.write(key_pair)
+            os.chmod(env_vars['key_pair_path'], 0600)
         else:
-            print ('we can find the pem key in your laptop but the bublic key is not on aws')
+            print ('we can find the public key but pem is not available')
             sys.exit()
     else:
         print ('the key pair exists')
@@ -119,10 +115,11 @@ def initiate():
             print ('the policy {0} exists'.format(policy))
             policy_attach.append(policy_arn)
     
-    role_arn = 'arn:aws:iam::{0}:role/{1}'.format(account_id, env_vars['role_name'])
+    # role_arn = 'arn:aws:iam::{0}:role/{1}'.format(account_id, env_vars['role_name'])
 
     if not awsiamf.check_role_exists(env_vars['role_name']):
         awsiamf.create_role_for_ec2(env_vars['role_name'])
+        awsiamf.create_instance_profile(env_vars['role_name'])
 
     if awsiamf.check_role_exists(env_vars['role_name'], 1, 5):
         for policy in policy_attach:
@@ -132,7 +129,7 @@ def initiate():
         print (' was not able to find the role')
         sys.exit()
 
-    awsiamf.create_instance_profile(env_vars['role_name'])
+    
     
 
     with open(env_var_path, 'w') as f:

@@ -181,7 +181,7 @@ class AWSec2Funcs:
         print (len(volume_info['Volumes']) )
 
     def create_key_pair(self, key_name):
-        return self.ec2.create_key_pair(KeyName=key_name)
+        return self.ec2.create_key_pair(KeyName=key_name).key_material
 
     def check_key_pair(self, key_name):
         key_pairs = self.client.describe_key_pairs()['KeyPairs']
