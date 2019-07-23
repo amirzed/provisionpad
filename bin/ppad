@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+# PYTHON_ARGCOMPLETE_OK
 
 # from provisionpad.runs import *
 
 import sys
 import os
 import argparse
+import argcomplete
 import json
 from provisionpad.db.database import load_database
 from provisionpad.runs.create_instance import create_instance
@@ -13,15 +15,18 @@ from provisionpad.runs.stop_instance import stop_instance
 from provisionpad.runs.start_instance import start_instance
 from provisionpad.runs.create_vpc import create_vpc
 from provisionpad.runs.initiate import initiate
+from provisionpad.runs.status import show_status
 
 parser = argparse.ArgumentParser(description='A function to create instance', 
                                     usage='%(prog)s [OPTIONS]')
 parser.add_argument("command")
+# parser.add_argument("command", nargs='+', choices=('initiate', 'create', 'terminate', 'stop', 'start'))
 parser.add_argument("-n", "--name", dest="boxname", default="", 
                     help="Enter the name of the sandbox:")
 parser.add_argument("-t", "--type", dest="boxtype", default="t2.micro", 
                     help="The type of instance. For example for ec2 t2.micro blah blah")
 
+# argcomplete.autocomplete(parser)
 args = parser.parse_args()
 command = args.command
 boxname = args.boxname
@@ -60,11 +65,14 @@ elif command == 'stop':
     if not boxname:
         print('Please enter the name of the box you want to remove')
         sys.exit()
-    DB = load_database()
-    stop_instance(boxname, DB)
+    DB = load_database(env_vars['db_path'])
+    stop_instance(boxname, env_vars, DB)
 elif command == 'start':
     if not boxname:
         print('Please enter the name of the box you want to remove')
         sys.exit()
-    DB = load_database()
-    start_instance(boxname, DB)
+    DB = load_database(env_vars['db_path'])
+    start_instance(boxname, env_vars, DB)
+elif command == 'stat':
+    DB = load_database(env_vars['db_path'])
+    show_status(env_vars, DB)

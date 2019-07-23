@@ -65,6 +65,7 @@ Host {0}
     User ubuntu
     IdentityFile {2}
     ForwardAgent yes
+    StrictHostKeyChecking no
 '''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path), 
 os.path.join(home_folder,'.ssh/config'))
     save_database(DB, env_vars['db_path'])

@@ -2,10 +2,9 @@ import os
 import sys
 from provisionpad.db.database import load_database
 
-def show_status():
-    DB = load_database()
+def show_status(env_vars, DB):
     print (DB)
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    show_status()
+#     show_status()

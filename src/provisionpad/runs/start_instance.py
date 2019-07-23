@@ -7,16 +7,16 @@ from provisionpad.helpers.texthelpers import write_into_text
 
      
 
-def start_instance(boxname, DB):
+def start_instance(boxname, env_vars, DB):
 
     if boxname not in DB['stopped_instances']:
         print ('the box is not available check again:')
         sys.exit()
 
-    region = os.environ['aws_region']
-    home_folder = os.environ['my_home_folder']
-    access_key = os.environ['aws_access_key_id']
-    secret_key = os.environ['aws_secret_access_key']
+    region = env_vars['aws_region']
+    home_folder = env_vars['HOME']
+    access_key = env_vars['access_key']
+    secret_key = env_vars['secret_key']
     awsf = AWSec2Funcs(region, access_key, secret_key)
 
     my_ssh_key_path = os.environ['my_ssh_key']
@@ -27,7 +27,7 @@ def start_instance(boxname, DB):
     del(DB['stopped_instances'][boxname])
     # DB['available_names'].append(boxname)
     print (DB)
-    save_database(DB)
+    save_database(DB, env_vars['db_path'])
     write_into_text(boxname,
 '''
 Host {0}
@@ -35,23 +35,24 @@ Host {0}
     User ubuntu
     IdentityFile {2}
     ForwardAgent yes
+    StrictHostKeyChecking no
 '''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path), 
 os.path.join(home_folder,'.ssh/config'))
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    import argparse
-    parser = argparse.ArgumentParser(description='A function to create instance', 
-                                     usage='%(prog)s [OPTIONS]')
-    parser.add_argument("-n", "--name", dest="boxname", default="", 
-                        help="Enter the name of the sandbox:")
-    args = parser.parse_args()
+#     import argparse
+#     parser = argparse.ArgumentParser(description='A function to create instance', 
+#                                      usage='%(prog)s [OPTIONS]')
+#     parser.add_argument("-n", "--name", dest="boxname", default="", 
+#                         help="Enter the name of the sandbox:")
+#     args = parser.parse_args()
     
-    boxname = args.boxname
+#     boxname = args.boxname
 
-    if not boxname:
-        print('Please enter the name of the box you want to remove')
-        sys.exit()
+#     if not boxname:
+#         print('Please enter the name of the box you want to remove')
+#         sys.exit()
 
-    DB = load_database()
-    start_instance(boxname, DB)
+#     DB = load_database()
+#     start_instance(boxname, DB)

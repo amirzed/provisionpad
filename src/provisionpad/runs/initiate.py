@@ -2,6 +2,7 @@ import platform
 import sys
 import os
 import json
+import subprocess
 from builtins import input
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
 from provisionpad.aws.aws_iam import AWSiamFuncs
@@ -52,6 +53,10 @@ def initiate():
     if not env_vars['your_name']:
         print ('Invalid input')
         sys.exit()
+    # import re
+    # original_string = open('foo.txt').read()
+    # new_string = re.sub('[^a-zA-Z0-9\n\.]', ' ', original_string)
+    # open('bar.txt', 'w').write(new_string)
     env_vars['your_email'] = input('Please enter the email you want to be associated with the env: ')
     print ('\n\n')
     print ('NOte: AMI (Image) should be in the same defined aws region')
@@ -94,7 +99,8 @@ def initiate():
                 key_pair = str(awsec2f.create_key_pair(key_pair_name))
                 print (key_pair)
                 f.write(key_pair)
-            os.chmod(env_vars['key_pair_path'], 0600)
+            subprocess.call(['chmod', '0600', env_vars['key_pair_path']])
+            # os.chmod(env_vars['key_pair_path'], 0600)
         else:
             print ('we can find the public key but pem is not available')
             sys.exit()
