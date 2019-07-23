@@ -19,8 +19,8 @@ def start_instance(boxname, env_vars, DB):
     secret_key = env_vars['secret_key']
     awsf = AWSec2Funcs(region, access_key, secret_key)
 
-    my_ssh_key_path = os.environ['my_ssh_key']
-    ssh_key_name = my_ssh_key_path.strip().rsplit('/', 1)[-1].split('.')[0]
+    my_ssh_key_path = env_vars['key_pair_path']
+    ssh_key_name = env_vars['key_pair_name']
 
     id = DB['stopped_instances'][boxname]['id']
     DB['running_instances'][boxname] = awsf.start_ec2_instance(id)

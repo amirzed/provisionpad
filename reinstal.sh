@@ -1,3 +1,3 @@
-pip uninstall provisionpad
+pip uninstall --yes provisionpad
 pip install .
 source ~/.bashrc

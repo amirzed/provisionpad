@@ -4,27 +4,7 @@ from provisionpad.aws.aws_ec2 import AWSec2Funcs
 from provisionpad.db.database import load_database, save_database
 from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import write_into_text
-
-
-def get_box_name(DB, dbpath):
-    """
-    gets redis variables names and returns the best name for the
-    newly created instance
-    """
-    if len(DB['available_names']) > 0:
-        dname = DB['available_names'].popleft()
-        if dname in DB['running_instances'] or\
-                dname in DB['stopped_instances'] :
-            print ('something wrong in this function fix me')
-            sys.exit()
-        boxn = dname
-    else:
-        boxi = DB['created_instances'] + 1
-        boxn = 'box{0}'.format(boxi)
-        DB['created_instances'] += 1
-        save_database(DB, dbpath)
-    return boxn
-        
+from provisionpad.helpers.namehelpers import get_box_name
 
 def create_instance(boxname, boxtype, env_vars, DB):
 

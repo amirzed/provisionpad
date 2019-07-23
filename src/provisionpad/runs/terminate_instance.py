@@ -17,7 +17,8 @@ def terminate_instance(boxname, env_vars, DB):
     id = DB['running_instances'][boxname]['id']
     awsf.terminate_ec2_instance(id)
     del(DB['running_instances'][boxname])
-    DB['available_names'].append(boxname)
+    if boxname[0:3] == 'box':
+        DB['available_names'].append(boxname)
     print (DB)
     save_database(DB, env_vars['db_path'])
     delete_text_from_file(boxname, os.path.join(home_folder,'.ssh/config'))

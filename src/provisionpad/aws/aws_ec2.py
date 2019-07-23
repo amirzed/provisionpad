@@ -57,7 +57,8 @@ class AWSec2Funcs:
  
         return vpctuple
 
-    def get_instance_info(self,id, instances_info):
+    def get_instance_info(self,id):
+        instances_info = self.client.describe_instances()['Reservations']
         rdict = {}
         for x in instances_info:
             for y in x['Instances']:
@@ -65,14 +66,27 @@ class AWSec2Funcs:
                     rdict['id'] = id
                     rdict['launch_time'] = y['LaunchTime']
                     rdict['type'] = y['InstanceType']
-                    rdict['public_dns'] = y['PublicDnsName']
-                    rdict['public_ip'] = y['PublicIpAddress']
+                    rdict['public_dns'] = y['PublicDnsName'] if 'PublicDnsName' in y else 'NA'
+                    rdict['public_ip'] = y['PublicIpAddress'] if 'PublicIpAddress' in y else 'NA'
                     rdict['private_dns'] = y['PrivateDnsName']
                     rdict['private_ip'] = y['PrivateIpAddress']
                     rdict['az'] = y['Placement']['AvailabilityZone'] # az is not me it is availabilityzone :D
                     rdict['pdrive'] = y['BlockDeviceMappings'][0]['Ebs']['VolumeId']
                     break
         return rdict
+
+    def instance_state(self, your_name):
+        instance_info = self.client.describe_instances()['Reservations']
+        # print (instance_info)
+        data = {}
+        for x in instance_info:
+            for y in x['Instances']:
+                for tag in y['Tags']:
+                    if tag['Key']=='Name' and your_name in tag['Value']:
+                        ip = y['PublicIpAddress'] if 'PublicIpAddress' in y else 'NA'
+                        data[y['InstanceId']] = [y['State']['Name'], ip]
+                        break
+        return data
 
     def create_ec2_instance(self, params):
 
@@ -105,8 +119,8 @@ class AWSec2Funcs:
                         KeyName=params['ssh_key_name'])
 
         instances[0].wait_until_running()
-        response = self.client.describe_instances()['Reservations']
-        return self.get_instance_info(instances[0].id, response)
+        # response = self.client.describe_instances()['Reservations']
+        return self.get_instance_info(instances[0].id)
 
     def terminate_ec2_instance(self, id):
         ids = [id,]
@@ -124,8 +138,8 @@ class AWSec2Funcs:
         ids = [id,]
         instances = self.ec2.instances.filter(InstanceIds=ids).start()
         self.ec2.Instance(id=id).wait_until_running()
-        response = self.client.describe_instances()['Reservations']
-        return self.get_instance_info(id, response)
+        # response = self.client.describe_instances()['Reservations']
+        return self.get_instance_info(id)
 
     def volume_waiter(self, id, state):
         # for i, x in enumerate(info):
