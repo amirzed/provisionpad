@@ -93,5 +93,16 @@ class AWSiamFuncs:
             return False
         return True
 
+    def create_instance_profile(self, name):
+        instance_profile = self.iam.create_instance_profile(
+            InstanceProfileName=name,
+            # Path='string'
+        )
+        time.sleep(1)
+        # instance_profile = self.iam.InstanceProfile(name)
+        instance_profile.add_role(
+            RoleName=name
+        )
+
 
 
