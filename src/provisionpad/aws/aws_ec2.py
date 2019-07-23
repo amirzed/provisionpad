@@ -174,10 +174,18 @@ class AWSec2Funcs:
         )
         print (response)
 
-
-        
     def get_volume_info(self, id):
         volume_info = self.client.describe_volumes()
         print (volume_info['Volumes'][0]['Attachments'])
         print (volume_info['Volumes'][1])
         print (len(volume_info['Volumes']) )
+
+    def create_key_pair(self, key_name):
+        return self.ec2.create_key_pair(KeyName=key_name)
+
+    def check_key_pair(self, key_name):
+        key_pairs = self.client.describe_key_pairs()['KeyPairs']
+        for key in key_pairs:
+            if key['KeyName'] == key_name:
+                return True
+        return False
