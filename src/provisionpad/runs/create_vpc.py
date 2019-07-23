@@ -5,7 +5,6 @@ from provisionpad.aws.aws_ec2 import AWSec2Funcs
 from provisionpad.db.database import load_database, save_database
 
 def create_vpc(env_vars, DB):
-    # DB = load_database()
     region = env_vars['aws_region']
     access_key = env_vars['access_key']
     secret_key = env_vars['secret_key']
@@ -20,7 +19,7 @@ def create_vpc(env_vars, DB):
     DB[thename]['vpc_id']    = vpc_params.vpc_id
     DB[thename]['sg_id']     = vpc_params.sg_id
     DB[thename]['subnet_id'] = vpc_params.subnet_id
-    save_database(DB)
+    save_database(DB, env_vars['db_path'])
 
 # if __name__ == "__main__":
 #     create_vpc()

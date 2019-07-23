@@ -3,7 +3,9 @@
 # from provisionpad.runs import *
 
 import sys
+import os
 import argparse
+import json
 from provisionpad.db.database import load_database
 from provisionpad.runs.create_instance import create_instance
 from provisionpad.runs.terminate_instance import terminate_instance
@@ -26,18 +28,34 @@ boxname = args.boxname
 boxtype = args.boxtype
 
 
+if command != 'initiate':
+    home = os.path.expanduser("~")
+    env_dir = os.path.join(home, '.provisionpad') 
+    env_var_path = os.path.join(env_dir, 'env_variable.json')
+    with open(env_var_path, 'r') as f:
+        env_vars = json.load(f)
+        if env_vars['env_path'] != env_var_path:
+            print ('something wrong')
+            sys.exit()
+    env_vars = {str(key):str(val) for key, val in env_vars.items()}
+
+
+
+# this part logically does not make sense as initiate does not get the path to env variables
+# Needs to be fixed -- Amir
 if command=='initiate':
     initiate()
 elif command=='create':
     print (boxname, boxtype, command)
-    DB = load_database()
-    create_instance(boxname, boxtype, DB)
+    DB = load_database(env_vars['db_path'])
+    print (DB)
+    create_instance(boxname, boxtype, env_vars, DB)
 elif command == 'terminate':
     if not boxname:
         print('Please enter the name of the box you want to remove')
         sys.exit()
-    DB = load_database()
-    terminate_instance(boxname, DB)
+    DB = load_database(env_vars['db_path'])
+    terminate_instance(boxname, env_vars, DB)
 elif command == 'stop':
     if not boxname:
         print('Please enter the name of the box you want to remove')

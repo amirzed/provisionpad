@@ -6,7 +6,7 @@ from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import write_into_text
 
 
-def get_box_name(DB):
+def get_box_name(DB, dbpath):
     """
     gets redis variables names and returns the best name for the
     newly created instance
@@ -22,27 +22,23 @@ def get_box_name(DB):
         boxi = DB['created_instances'] + 1
         boxn = 'box{0}'.format(boxi)
         DB['created_instances'] += 1
-        save_database(DB)
+        save_database(DB, dbpath)
     return boxn
         
 
-def create_instance(boxname, boxtype, DB):
+def create_instance(boxname, boxtype, env_vars, DB):
 
-    DB = load_database()
-
-    region = os.environ['aws_region']
-    home_folder = os.environ['my_home_folder']
-    access_key = os.environ['aws_access_key_id']
-    secret_key = os.environ['aws_secret_access_key']
+    region = env_vars['aws_region']
+    home_folder = env_vars['HOME']
+    access_key = env_vars['access_key']
+    secret_key = env_vars['secret_key']
     awsf = AWSec2Funcs(region, access_key, secret_key)
 
-    my_ssh_key_path = os.environ['my_ssh_key']
-    ssh_key_name = my_ssh_key_path.strip().rsplit('/', 1)[-1].split('.')[0]
-
-    vpcname = vpc_name()
+    my_ssh_key_path = env_vars['key_pair_path']
+    ssh_key_name = env_vars['key_pair_name']
 
     if not boxname:
-        boxname = get_box_name(DB)
+        boxname = get_box_name(DB, env_vars['db_path'])
     else:
         if boxname[:3] == 'box' or \
                 boxname in DB['runnin_instances'] or \
@@ -52,13 +48,14 @@ def create_instance(boxname, boxtype, DB):
 
     params = {}
     params['ssh_key_name'] = ssh_key_name
-    params['aws_ami'] = os.environ['aws_ami']
-    params['aws_iam_role'] = os.environ['iam_role']
-    params['vpc'] = DB[vpcname]
+    params['aws_ami'] = env_vars['aws_ami']
+    params['aws_iam_role'] = env_vars['role_name']
+    params['vpc'] = DB[env_vars['vpc_name'] ]
     params['box_type'] = boxtype
-    params['name'] = os.environ['your_name'].replace(" ", "")+boxname
+    params['name'] = env_vars['your_name']+boxname
 
     # DB[boxname] = awsf.create_ec2_instance(params)
+    print (params)
     DB['running_instances'][boxname] = awsf.create_ec2_instance(params)
     print (DB)
     write_into_text(boxname,
@@ -70,23 +67,23 @@ Host {0}
     ForwardAgent yes
 '''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path), 
 os.path.join(home_folder,'.ssh/config'))
-    save_database(DB)
+    save_database(DB, env_vars['db_path'])
 
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    import argparse
-    parser = argparse.ArgumentParser(description='A function to create instance', 
-                                     usage='%(prog)s [OPTIONS]')
-    parser.add_argument("-n", "--name", dest="boxname", default="", 
-                        help="Enter the name of the sandbox:")
-    parser.add_argument("-t", "--type", dest="boxtype", default="t2.micro", 
-                        help="The type of instance. For example for ec2 t2.micro blah blah")
-    args = parser.parse_args()
+#     import argparse
+#     parser = argparse.ArgumentParser(description='A function to create instance', 
+#                                      usage='%(prog)s [OPTIONS]')
+#     parser.add_argument("-n", "--name", dest="boxname", default="", 
+#                         help="Enter the name of the sandbox:")
+#     parser.add_argument("-t", "--type", dest="boxtype", default="t2.micro", 
+#                         help="The type of instance. For example for ec2 t2.micro blah blah")
+#     args = parser.parse_args()
     
-    boxname = args.boxname
-    boxtype = args.boxtype
+#     boxname = args.boxname
+#     boxtype = args.boxtype
 
-    DB = load_database()
-    create_instance(boxname, boxtype, DB)
+#     DB = load_database()
+#     create_instance(boxname, boxtype, DB)

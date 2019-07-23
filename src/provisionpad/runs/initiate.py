@@ -10,7 +10,13 @@ from provisionpad.runs.create_vpc import create_vpc
 
 def initiate():
 
-    DB = load_database()
+
+    home = os.path.expanduser("~")
+    env_dir = os.path.join(home, '.provisionpad') 
+    if not os.path.isdir(env_dir):
+        os.mkdir(env_dir)
+    dbpath = os.path.join(env_dir, 'database.p')
+    DB = load_database(dbpath)
 
     if platform.python_version()[0] == '2':
         input = raw_input
@@ -25,6 +31,8 @@ def initiate():
         sys.exit('to be completed later')
 
     env_vars = {}
+    env_vars['db_path'] = dbpath
+    env_vars['env_path'] = env_var_path
     print ('Initiating a new ppad environment')
     print ('  You can find aws access keys under user tab (top third from right)')
     print ('  My security credentials for the root info or under IAM users section')
@@ -117,35 +125,13 @@ def initiate():
     else:
         print (' was not able to find the role')
         sys.exit()
+
+    awsiamf.create_instance_profile(env_vars['role_name'])
     
 
     with open(env_var_path, 'w') as f:
         json.dump(env_vars, f, indent=4)
 
-
-    # region = os.environ['aws_region']
-    # access_key = os.environ['aws_access_key_id']
-    # secret_key = os.environ['aws_secret_access_key']
-
-
-    # role_arn = 'ec2s3accessful'
-    # role_arn = 'amirtestdd'
-
-    # awsiamf = AWSiamFuncs(region, access_key, secret_key)
-
-    # if not awsiamf.check_role_exists(role_arn):
-    #     awsiamf.create_role_for_ec2(role_arn)
-
-    # try: 
-    #     awsiamf.check_role_exists(role_arn, 1, 3)
-    #     for policy in policy_attach:
-    #         awsiamf.attach_policy_to_role(env_vars['role_name'], policy)
-    # except:
-    #     print (' was not able to find the role')
-    #     sys.exit()
-
-    # # print (awsiamf.check_role_exists(role_arn, 1, 3) )
-    # # # # awsf.attach_policy_to_role('amir_role',policy_arn)
 
 
      
