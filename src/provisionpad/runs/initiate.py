@@ -18,8 +18,14 @@ def initiate():
     dbpath = os.path.join(env_dir, 'database.p')
     DB = load_database(dbpath)
 
-    if platform.python_version()[0] == '2':
+    # if platform.python_version()[0] == '2':
+    #     input = raw_input
+    try: 
+        raw_input
         input = raw_input
+    except:
+        pass
+
 
     home = os.path.expanduser("~")
     env_dir = os.path.join(home, '.provisionpad') 
