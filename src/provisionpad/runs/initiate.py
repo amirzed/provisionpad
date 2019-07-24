@@ -61,10 +61,10 @@ def initiate():
     print ('\n\n')
     print ('NOte: AMI (Image) should be in the same defined aws region')
     print ('Otherwise you will encounter errors later on')
-    env_vars['aws_region'] = input ('Please enter your aws region. If nothing entered us-east-2 would be used as default')
+    env_vars['aws_region'] = input ('Please enter your aws region. If nothing entered us-east-2 would be used as default: ')
     if not env_vars['aws_region']:
         env_vars['aws_region'] = 'us-east-2'
-    env_vars['aws_ami'] = input ('Please enter your aws ami. If nothing entered default Ubuntu 18 will be used')
+    env_vars['aws_ami'] = input ('Please enter your aws ami. If nothing entered default Ubuntu 18 will be used: ')
     if not env_vars['aws_ami']:
         env_vars['aws_ami'] = 'ami-00df714b389c23925'
 

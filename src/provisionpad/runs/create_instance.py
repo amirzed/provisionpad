@@ -21,7 +21,7 @@ def create_instance(boxname, boxtype, env_vars, DB):
         boxname = get_box_name(DB, env_vars['db_path'])
     else:
         if boxname[:3] == 'box' or \
-                boxname in DB['runnin_instances'] or \
+                boxname in DB['running_instances'] or \
                 boxname in DB['stopped_instances']:
             print ("enter a better name. either exists or starts with box")
             sys.exit()

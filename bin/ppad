@@ -76,3 +76,7 @@ elif command == 'start':
 elif command == 'stat':
     DB = load_database(env_vars['db_path'])
     show_status(env_vars, DB)
+else:
+    print ('command not found')
+    sys.exit()
+
