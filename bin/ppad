@@ -17,6 +17,8 @@ from provisionpad.runs.create_vpc import create_vpc
 from provisionpad.runs.initiate import initiate
 from provisionpad.runs.status import show_status
 
+shut_down_time = 20
+
 parser = argparse.ArgumentParser(description='A function to create instance', 
                                     usage='%(prog)s [OPTIONS]')
 parser.add_argument("command")
@@ -54,7 +56,7 @@ elif command=='create':
     print (boxname, boxtype, command)
     DB = load_database(env_vars['db_path'])
     print (DB)
-    create_instance(boxname, boxtype, env_vars, DB)
+    create_instance(boxname, boxtype, shut_down_time, env_vars, DB)
 elif command == 'terminate':
     if not boxname:
         print('Please enter the name of the box you want to remove')

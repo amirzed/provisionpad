@@ -1,12 +1,13 @@
 import os
 import sys
+import time
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
 from provisionpad.db.database import load_database, save_database
 from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import write_into_text
 from provisionpad.helpers.namehelpers import get_box_name
 
-def create_instance(boxname, boxtype, env_vars, DB):
+def create_instance(boxname, boxtype, shut_down_time, env_vars, DB):
 
     region = env_vars['aws_region']
     home_folder = env_vars['HOME']
@@ -49,6 +50,41 @@ Host {0}
 '''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path), 
 os.path.join(home_folder,'.ssh/config'))
     save_database(DB, env_vars['db_path'])
+
+
+    write_into_text('timeer',
+'''
+import psutil
+idle_time = psutil.cpu_times().idle
+import os
+with open('/home/ubuntu/test.file', 'w') as f:
+    f.write('idle time: {0}, total_time: {1}, ratio: {2}'.format(idle_time, float({1}), idle_time/float({2})))
+if idle_time/float({0})>0.95:
+    os.system('sudo poweroff')
+'''.format(shut_down_time*60, shut_down_time*60, shut_down_time*60),
+'/tmp/tclock.py')
+
+#     write_into_text('timeer',
+# '''
+# * * * * * python /home/ubuntu/.provisionpad/tclock.py
+# ''',
+# '/tmp/mycron')
+    with open('/tmp/mycron', 'w') as f:
+        f.write('*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time))
+
+    print ('going to sleep')
+    time.sleep(60)
+    print ('going to wake up')
+
+    os.system('ssh {0} pip install psutil'.format(boxname))
+    os.system('ssh {0} mkdir .provisionpad'.format(boxname))
+    os.system('scp /tmp/tclock.py {0}:~/.provisionpad/'.format(boxname))
+    os.system('scp /tmp/mycron {0}:~/.provisionpad/'.format(boxname))
+    os.system('ssh {0} crontab /home/ubuntu/.provisionpad/mycron'.format(boxname))
+    os.system('rm -rf /tmp/mycron')
+    os.system('rm -rf /tmp/tclock.py')
+
+
 
 
 
