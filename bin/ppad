@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # PYTHON_ARGCOMPLETE_OK
 
-# from provisionpad.runs import *
-
 import sys
 import os
 import argparse
 import argcomplete
 import json
+import textwrap
 from provisionpad.db.database import load_database
 from provisionpad.runs.create_instance import create_instance
 from provisionpad.runs.terminate_instance import terminate_instance
@@ -19,66 +18,161 @@ from provisionpad.runs.status import show_status
 
 shut_down_time = 20
 
-parser = argparse.ArgumentParser(description='A function to create instance', 
-                                    usage='%(prog)s [OPTIONS]')
-parser.add_argument("command")
-# parser.add_argument("command", nargs='+', choices=('initiate', 'create', 'terminate', 'stop', 'start'))
-parser.add_argument("-n", "--name", dest="boxname", default="", 
-                    help="Enter the name of the sandbox:")
-parser.add_argument("-t", "--type", dest="boxtype", default="t2.micro", 
-                    help="The type of instance. For example for ec2 t2.micro blah blah")
+from argparse import RawTextHelpFormatter
 
-# argcomplete.autocomplete(parser)
-args = parser.parse_args()
-command = args.command
-boxname = args.boxname
-boxtype = args.boxtype
+class PPAD(object):
+
+    def __init__(self):
+        parser = argparse.ArgumentParser(
+            description='A very simple command line tool to control'
+                        'your remote cloud based workstation',
+            usage='''%(prog)s <command> [<args>]
+
+The following commands are available:
+    initiate   :   Initiate your test environment; only use it once
+    create     :   Create a new computing instance
+    terminate  :   Terminate the already running instance
+    stop       :   Stop the running instance
+    start      :   Start an stopped instance
+    stat       :   Get the information on the current workspace
+''')
+        parser.add_argument('command', help='Choose one of (initiate, create, terminate, stop, start, stat) to run')
+        args = parser.parse_args(sys.argv[1:2])
+        if not hasattr(self, args.command):
+            print ('Unrecognized command')
+            parser.print_help()
+            exit(1)
+        getattr(self, args.command)()
+
+    def get_env_vars(self):
+        home = os.path.expanduser("~")
+        env_dir = os.path.join(home, '.provisionpad') 
+        env_var_path = os.path.join(env_dir, 'env_variable.json')
+        with open(env_var_path, 'r') as f:
+            env_vars = json.load(f)
+            if env_vars['env_path'] != env_var_path:
+                print ('something wrong')
+                raise ('The environment variable seems to be a wrong one')
+        env_vars = {str(key):str(val) for key, val in env_vars.items()}
+        return env_vars
+
+    def initiate(self):
+        initiate()
+
+    def create(self):
+
+        env_vars = self.get_env_vars()
+        DB = load_database(env_vars['db_path'])
+
+        parser = argparse.ArgumentParser(
+            description='Create a new computing instance',
+            usage='''ppad create [option]s
+
+If no name is provided an automatic name starting with box will be used.
+Please note you can not use names starting with box.
+If no instance type is provided the default t2.micro will be sued for aws
+as the instance type qualifies for the free tier            
+            
+''')
+
+        parser.add_argument('name', nargs='?', help='Enter the name you want to use')
+        parser.add_argument('type', nargs='?', help='''Enter the type of computing instance
+                                                    If you are using AWS see the following link for further info:
+                                                    https://aws.amazon.com/ec2/pricing/on-demand/
+                                                    ''')
+
+        args = parser.parse_args(sys.argv[2:])
+        if not args.name:
+            boxname = ''
+        
+        if not args.type:
+            boxtype = 't2.micro'
+        # print (args.name)
+        # parser.add_argument("-n", "--name", dest="boxname", default="", 
+        #                     help="Enter the name of the sandbox:")
+        # parser.add_argument("-t", "--type", dest="boxtype", default="t2.micro", 
+        #                     help="The type of instance. For example for ec2 t2.micro blah blah")
+
+        # args = parser.parse_args(sys.argv[2:])
+        # # print ('Running git commit, amend=%s' % args.amend)
+        # boxname = args.boxname
+        # boxtype = args.boxtype
+
+        create_instance(boxname, boxtype, shut_down_time, env_vars, DB)
+
+    def terminate(self):
+
+        env_vars = self.get_env_vars()
+        DB = load_database(env_vars['db_path'])
+
+        parser = argparse.ArgumentParser(
+            description='Create a new computing instance',
+            usage='''ppad terminate thename
+
+for example:
+    ppad terminate box2 
+    the command above will terminate the box2 and the associated root volume           
+            
+''')
+
+        parser.add_argument('name', nargs='+', help='Enter the name of the box you want to terminate')
+
+        args = parser.parse_args(sys.argv[2:])
+        boxname = args.name
+
+        terminate_instance(boxname, env_vars, DB)
+    
+    def stop(self):
+
+        env_vars = self.get_env_vars()
+        DB = load_database(env_vars['db_path'])
+
+        parser = argparse.ArgumentParser(
+            description='Create a new computing instance',
+            usage='''ppad stop thename
+
+for example:
+    ppad terminate box2 
+    the command above will stop the box2 and the associated root volume           
+            
+''')
+
+        parser.add_argument('name', nargs='+', help='Enter the name of the box you want to terminate')
+
+        args = parser.parse_args(sys.argv[2:])
+        boxname = args.name
+
+        stop_instance(boxname, env_vars, DB)
+    
+    def start(self):
+
+        env_vars = self.get_env_vars()
+        DB = load_database(env_vars['db_path'])
+
+        parser = argparse.ArgumentParser(
+            description='Create a new computing instance',
+            usage='''ppad stop thename
+
+for example:
+    ppad terminate box2 
+    the command above will stop the box2 and the associated root volume           
+            
+''')
+
+        parser.add_argument('name', nargs='+', help='Enter the name of the box you want to terminate')
+
+        args = parser.parse_args(sys.argv[2:])
+        boxname = args.name
+
+        start_instance(boxname, env_vars, DB)
 
 
-if command != 'initiate':
-    home = os.path.expanduser("~")
-    env_dir = os.path.join(home, '.provisionpad') 
-    env_var_path = os.path.join(env_dir, 'env_variable.json')
-    with open(env_var_path, 'r') as f:
-        env_vars = json.load(f)
-        if env_vars['env_path'] != env_var_path:
-            print ('something wrong')
-            sys.exit()
-    env_vars = {str(key):str(val) for key, val in env_vars.items()}
+    def stat(self):
 
+        env_vars = self.get_env_vars()
+        DB = load_database(env_vars['db_path'])
+        show_status(env_vars, DB)
 
-
-# this part logically does not make sense as initiate does not get the path to env variables
-# Needs to be fixed -- Amir
-if command=='initiate':
-    initiate()
-elif command=='create':
-    print (boxname, boxtype, command)
-    DB = load_database(env_vars['db_path'])
-    print (DB)
-    create_instance(boxname, boxtype, shut_down_time, env_vars, DB)
-elif command == 'terminate':
-    if not boxname:
-        print('Please enter the name of the box you want to remove')
-        sys.exit()
-    DB = load_database(env_vars['db_path'])
-    terminate_instance(boxname, env_vars, DB)
-elif command == 'stop':
-    if not boxname:
-        print('Please enter the name of the box you want to remove')
-        sys.exit()
-    DB = load_database(env_vars['db_path'])
-    stop_instance(boxname, env_vars, DB)
-elif command == 'start':
-    if not boxname:
-        print('Please enter the name of the box you want to remove')
-        sys.exit()
-    DB = load_database(env_vars['db_path'])
-    start_instance(boxname, env_vars, DB)
-elif command == 'stat':
-    DB = load_database(env_vars['db_path'])
-    show_status(env_vars, DB)
-else:
-    print ('command not found')
-    sys.exit()
+if __name__ == '__main__':
+    PPAD()
 
