@@ -30,7 +30,8 @@ def initiate():
 
     if os.path.isfile(env_var_path):
         print ('the env variable file already exists')
-        sys.exit('to be completed later')
+        print ('If no manual intteruption seems you are all set')
+        sys.exit('Exception handeling for this part will be tested later')
 
     if not os.path.isfile(input_var_path):
         env_vars = {}
