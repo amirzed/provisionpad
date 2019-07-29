@@ -1,6 +1,7 @@
 import os
 import sys
 import boto3
+from botocore.exceptions import ClientError
 import json
 import time
 from provisionpad.aws.aws_sts import AWSstsFuncs
@@ -57,8 +58,11 @@ class AWSiamFuncs:
                     'MaxAttempts': maxattempts
                 }
             )
-        except:
-            return False
+        except ClientError as e:
+            if 'not authorized' in str(e):
+                raise
+            else:
+                return False
         return True
 
     def create_role_for_ec2(self, role_name):  

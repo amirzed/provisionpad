@@ -64,7 +64,7 @@ class AWSec2Funcs:
             
             vpctuple.sg_id = securitygroup.id
             vpctuple.subnet_id = subnet.id
-            
+
         except:
             pass
 
