@@ -6,8 +6,11 @@ from provisionpad.db.database import load_database, save_database
 from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import write_into_text
 from provisionpad.helpers.namehelpers import get_box_name
+from provisionpad.helpers.update_status import update_status
 
 def create_instance(boxname, boxtype, shut_down_time, env_vars, DB):
+
+    update_status(env_vars,DB)
 
     region = env_vars['aws_region']
     home_folder = env_vars['HOME']
