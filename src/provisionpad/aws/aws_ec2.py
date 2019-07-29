@@ -1,8 +1,11 @@
 import os
 import sys
 import time
+from collections import defaultdict
+import json
 
 import boto3
+from botocore.exceptions import ClientError
 from collections import namedtuple
 
 
@@ -16,46 +19,86 @@ class AWSec2Funcs:
 
         self.ec2 = boto3.resource('ec2', region_name=region,
                                 aws_access_key_id=access_key,
-                                aws_secret_access_key=secret_key )
+                                aws_secret_access_key=secret_key)
 
         self.client = boto3.client('ec2', region_name=region,
                                     aws_access_key_id=access_key,
-                                    aws_secret_access_key=secret_key )
+                                    aws_secret_access_key=secret_key)
 
        
     def create_vpc(self, thename):
 
-        # create VPC
-        vpc = self.ec2.create_vpc(CidrBlock='172.16.0.0/16')
-        vpc.create_tags(Tags=[{'Key': 'Name', 'Value': thename}])
-        vpc.wait_until_available()
-
-        # enable public dns hostname so that we can SSH into it later
-        self.client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsSupport = { 'Value': True } )
-        self.client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsHostnames = { 'Value': True } )
-
-        # create an internet gateway and attach it to VPC
-        internetgateway = self.ec2.create_internet_gateway()
-        vpc.attach_internet_gateway(InternetGatewayId=internetgateway.id)
-
-        # create a route table and a public route
-        routetable = vpc.create_route_table()
-        route = routetable.create_route(DestinationCidrBlock='0.0.0.0/0', GatewayId=internetgateway.id)
-
-        # create subnet and associate it with route table
-        subnet = self.ec2.create_subnet(CidrBlock='172.16.1.0/24', VpcId=vpc.id)
-        routetable.associate_with_subnet(SubnetId=subnet.id)
-
-        # Create a security group and allow SSH inbound rule through the VPC
-        securitygroup = self.ec2.create_security_group(GroupName='SSH-ONLY', Description='only allow SSH traffic', VpcId=vpc.id)
-        securitygroup.authorize_ingress(CidrIp='0.0.0.0/0', IpProtocol='tcp', FromPort=22, ToPort=22)
-
         vpctuple = namedtuple(thename, ['sg_id', 'subnet_id', 'vpc_id'])
-        vpctuple.sg_id = securitygroup.id
-        vpctuple.subnet_id = subnet.id
-        vpctuple.vpc_id = vpc.id
- 
+        vpctuple.vpc_id = -1
+        vpctuple.sg_id = -1
+        vpctuple.subnet_id = -1
+
+        try:
+            # create VPC
+            vpc = self.ec2.create_vpc(CidrBlock='172.16.0.0/16')
+            vpc.create_tags(Tags=[{'Key': 'Name', 'Value': thename}])
+            vpc.wait_until_available()
+
+            vpctuple.vpc_id = vpc.id
+
+            # enable public dns hostname so that we can SSH into it later
+            self.client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsSupport = { 'Value': True } )
+            self.client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsHostnames = { 'Value': True } )
+
+            # create an internet gateway and attach it to VPC
+            internetgateway = self.ec2.create_internet_gateway()
+            vpc.attach_internet_gateway(InternetGatewayId=internetgateway.id)
+
+            # create a route table and a public route
+            routetable = vpc.create_route_table()
+            route = routetable.create_route(DestinationCidrBlock='0.0.0.0/0', GatewayId=internetgateway.id)
+
+            # create subnet and associate it with route table
+            subnet = self.ec2.create_subnet(CidrBlock='172.16.1.0/24', VpcId=vpc.id)
+            routetable.associate_with_subnet(SubnetId=subnet.id)
+
+            # Create a security group and allow SSH inbound rule through the VPC
+            securitygroup = self.ec2.create_security_group(GroupName='SSH-ONLY', Description='only allow SSH traffic', VpcId=vpc.id)
+            securitygroup.authorize_ingress(CidrIp='0.0.0.0/0', IpProtocol='tcp', FromPort=22, ToPort=22)
+
+            
+            vpctuple.sg_id = securitygroup.id
+            vpctuple.subnet_id = subnet.id
+            
+        except:
+            pass
+
         return vpctuple
+
+
+    def delete_vpc(self, vpcid):
+
+        vpc = self.ec2.Vpc(vpcid)
+        # Delete custom security groups
+        for sg in vpc.security_groups.all():
+            if sg.group_name != 'default':
+                sg.revoke_ingress(IpPermissions=sg.ip_permissions)
+                sg.delete()
+
+        # detach and delete all gateways associated with the vpc
+        for gw in vpc.internet_gateways.all():
+            vpc.detach_internet_gateway(InternetGatewayId=gw.id)
+            gw.delete()
+
+        # delete any instances
+        for subnet in vpc.subnets.all():
+            # print (thesubnetid)
+            # for instance in subnet.instances.all():
+            #     instance.terminate()    
+            subnet.delete()
+ 
+        for rt in vpc.route_tables.all():
+            try:
+                rt.delete()
+            except:
+                pass
+        
+        self.client.delete_vpc(VpcId=vpcid)
 
     def get_instance_info(self,id):
         instances_info = self.client.describe_instances()['Reservations']
