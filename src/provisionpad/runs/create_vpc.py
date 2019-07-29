@@ -10,16 +10,18 @@ def create_vpc(env_vars, DB):
     secret_key = env_vars['secret_key']
     awsf = AWSec2Funcs(region, access_key, secret_key)
     thename = env_vars['vpc_name']
-    if thename in DB:
-        print ('The VPC with the name: {0} exists.'.format(thename))
-        sys.exit()
+    filters = [{'Name':'tag:Name', 'Values':[thename]}]
+    vpcs = list(awsf.ec2.vpcs.filter(Filters=filters))
 
-    # awsf.create_vpc(thename)
-    # try:
-    #     x = open('/sdfaqq/qwersadf')
-    # except:
-    #     raise Exception('Hey Dude')
-    # try:
+    if len(vpcs)==1 and thename in DB:
+        print ('The VPC with the name: {0} exists.'.format(thename))
+        print ('will continue to use it')
+        return 
+    elif thename not in DB:
+        pass
+    else:
+        raise Exception('Either VPC does not exists or DB has changed')
+    
     vpc_params = awsf.create_vpc(thename)
     vpcid = vpc_params.vpc_id
     # vpcid = 'vpc-04757c1ab435658e8'
