@@ -19,9 +19,11 @@ def update_status(env_vars, DB):
     aws_inst_info = awsec2f.instance_state(env_vars['your_name'])
 
     for ins in aws_inst_info:
-        if not (aws_inst_info[ins][0] == 'stopped' and 
-                aws_inst_info[ins][0] == 'running' and
+        print (aws_inst_info[ins][0])
+        if not (aws_inst_info[ins][0] == 'stopped' or 
+                aws_inst_info[ins][0] == 'running' or
                 aws_inst_info[ins][0] == 'terminated'):
+            print (aws_inst_info[ins][0])
             print ('try a little bit later there is a transition going on')
             sys.exit()
 
