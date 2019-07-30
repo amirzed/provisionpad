@@ -38,9 +38,14 @@ static_setup_params = dict(
     classifiers=[
         'Development Status :: Test',
     ],
-    scripts=[
-        'bin/ppad',
-    ],
+    # scripts=[
+    #     'bin/ppad',
+    # ],
+    entry_points={
+        'console_scripts': [
+            'ppad = provisionpad.bin.ppad:main',
+        ]
+    }
 )
 
 def main():
