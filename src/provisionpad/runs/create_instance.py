@@ -39,9 +39,9 @@ def create_instance(boxname, boxtype, shut_down_time, env_vars, DB):
     params['name'] = env_vars['your_name']+boxname
 
     # DB[boxname] = awsf.create_ec2_instance(params)
-    print (params)
+    # print (params)
     DB['running_instances'][boxname] = awsf.create_ec2_instance(params)
-    print (DB)
+    # print (DB)
     write_into_text(boxname,
 '''
 Host {0}
@@ -54,7 +54,11 @@ Host {0}
 os.path.join(home_folder,'.ssh/config'))
     save_database(DB, env_vars['db_path'])
 
-
+    tmp_dir = os.path.join(env_vars['env_dir'], 'tmp')
+    tmp_tclock = os.path.join(tmp_dir,'tclock.py')
+    tmp_cron = os.path.join(tmp_dir,'cron')
+    if not os.path.isdir(tmp_dir):
+        os.mkdir(tmp_dir  )
     write_into_text('timeer',
 '''
 import psutil
@@ -65,15 +69,16 @@ with open('/home/ubuntu/test.file', 'w') as f:
 if idle_time/float({0})>0.95:
     os.system('sudo poweroff')
 '''.format(shut_down_time*60, shut_down_time*60, shut_down_time*60),
-'/tmp/tclock.py')
+tmp_tclock)
 
 #     write_into_text('timeer',
 # '''
 # * * * * * python /home/ubuntu/.provisionpad/tclock.py
 # ''',
 # '/tmp/mycron')
-    with open('/tmp/mycron', 'w') as f:
-        f.write('*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time))
+    with open(tmp_cron, 'wb') as f:
+        towrite = '*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
+        f.write(towrite.encode('UTF-8'))
 
     print ('going to sleep')
     time.sleep(60)
@@ -81,11 +86,11 @@ if idle_time/float({0})>0.95:
 
     os.system('ssh {0} pip install psutil'.format(boxname))
     os.system('ssh {0} mkdir .provisionpad'.format(boxname))
-    os.system('scp /tmp/tclock.py {0}:~/.provisionpad/'.format(boxname))
-    os.system('scp /tmp/mycron {0}:~/.provisionpad/'.format(boxname))
-    os.system('ssh {0} crontab /home/ubuntu/.provisionpad/mycron'.format(boxname))
-    os.system('rm -rf /tmp/mycron')
-    os.system('rm -rf /tmp/tclock.py')
+    os.system('scp {0} {1}:~/.provisionpad/'.format(tmp_cron, boxname))
+    os.system('scp {0} {1}:~/.provisionpad/'.format(tmp_tclock, boxname))
+    os.system('ssh {0} crontab /home/ubuntu/.provisionpad/cron'.format(boxname))
+    os.remove(tmp_cron)
+    os.remove(tmp_tclock)
 
 
 

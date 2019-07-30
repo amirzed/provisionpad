@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# PYTHON_ARGCOMPLETE_OK
-
 import sys
 import os
 import argparse
@@ -178,6 +175,12 @@ for example:
         DB = load_database(env_vars['db_path'])
         show_status(env_vars, DB)
 
-if __name__ == '__main__':
-    PPAD()
+        
+def main():
+   PPAD() 
+
+
+# main()
+# # if __name__ == '__main__':
+# #     main()
 

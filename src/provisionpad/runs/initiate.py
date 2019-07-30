@@ -76,6 +76,7 @@ def initiate():
 
     env_vars['db_path'] = dbpath
     env_vars['env_path'] = env_var_path
+    env_vars['env_dir'] = env_dir
 
     key_pair_name = 'ec2_keypair_{0}_{1}.pem'.format(env_vars['your_name'], env_vars['aws_region']) 
     key_pair_path = os.path.join(env_dir, key_pair_name)
@@ -109,10 +110,10 @@ def initiate():
                     key_pair = str(awsec2f.create_key_pair(key_pair_name))
                     print (key_pair)
                     f.write(key_pair)
-                subprocess.call(['chmod', '0600', env_vars['key_pair_path']])
-                # os.chmod(env_vars['key_pair_path'], 0600)
+                # subprocess.call(['chmod', '0600', env_vars['key_pair_path']])
+                os.chmod(env_vars['key_pair_path'], 0o600)
             except:
-                os.system('rm '+ env_vars['key_pair_path'])
+                os.remove(env_vars['key_pair_path'])
                 raise Exception('You do not have access to create key-pair check your permissions')
         else:
             raise Exception('we can find the public key but pem is not available')

@@ -124,11 +124,12 @@ class AWSec2Funcs:
         data = {}
         for x in instance_info:
             for y in x['Instances']:
-                for tag in y['Tags']:
-                    if tag['Key']=='Name' and your_name in tag['Value']:
-                        ip = y['PublicIpAddress'] if 'PublicIpAddress' in y else 'NA'
-                        data[y['InstanceId']] = [y['State']['Name'], ip]
-                        break
+                if 'Tags' in y:
+                    for tag in y['Tags']:
+                        if tag['Key']=='Name' and your_name in tag['Value']:
+                            ip = y['PublicIpAddress'] if 'PublicIpAddress' in y else 'NA'
+                            data[y['InstanceId']] = [y['State']['Name'], ip]
+                            break
         return data
 
     def create_ec2_instance(self, params):
