@@ -3,6 +3,7 @@ import sys
 from provisionpad.db.database import load_database, save_database
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
 from provisionpad.helpers.texthelpers import delete_text_from_file, write_into_text
+from provisionpad.helpers.texthelpers import clean_ppad_from_file
 from copy import deepcopy
 from provisionpad.helpers.namehelpers import get_box_name
 
@@ -17,20 +18,27 @@ def update_status(env_vars, DB):
     secret_key = env_vars['secret_key']
     awsec2f = AWSec2Funcs(region, access_key, secret_key)
     aws_inst_info = awsec2f.instance_state(env_vars['your_name'])
+    aws_inst_info_d = deepcopy(aws_inst_info)
+
+    clean_ppad_from_file(os.path.join(home_folder,'.ssh/config'))
 
     for ins in aws_inst_info:
-        print (aws_inst_info[ins][0])
+        # print (aws_inst_info[ins][0])
+        if aws_inst_info[ins][0] == 'terminated':
+            aws_inst_info_d.pop(ins)
         if not (aws_inst_info[ins][0] == 'stopped' or 
                 aws_inst_info[ins][0] == 'running' or
                 aws_inst_info[ins][0] == 'terminated'):
-            print (aws_inst_info[ins][0])
+            # print (aws_inst_info[ins][0])
             print ('try a little bit later there is a transition going on')
             sys.exit()
 
-    print (aws_inst_info)
+    aws_inst_info = aws_inst_info_d
+
+    # print (aws_inst_info)
     DBD = deepcopy(DB)
     for ins, ins_info in DBD['running_instances'].items():
-        print (ins, ins_info)
+        # print (ins, ins_info)
         if ins_info['id'] not in aws_inst_info:
             print ('seems like the instance you have created ')
             print ('has been removed from the aws manually most likely')
@@ -48,11 +56,21 @@ def update_status(env_vars, DB):
             save_database(DB, env_vars['db_path'])
             delete_text_from_file(ins, os.path.join(home_folder,'.ssh/config'))
         else:
+            write_into_text(ins,
+'''
+Host {0}
+    HostName {1}
+    User ubuntu
+    IdentityFile {2}
+    ForwardAgent yes
+    StrictHostKeyChecking no
+'''.format(ins, DB['running_instances'][ins]['public_ip'], env_vars['key_pair_path']), 
+os.path.join(home_folder,'.ssh/config'))
             print ('{0} is fine as expected'.format(ins))
 
     DBD = deepcopy(DB)
     for ins, ins_info in DBD['stopped_instances'].items():
-        print (ins, ins_info)
+        # print (ins, ins_info)
         if ins_info['id'] not in aws_inst_info:
             print ('seems like the instance you have created ')
             print ('has been removed from the aws manually most likely')
@@ -90,7 +108,8 @@ os.path.join(home_folder,'.ssh/config'))
 
     to_create = set(aws_inst_info) - ids_db 
     for x in to_create:
-        get_box_name(DB, env_vars['db_path'])
+        ins = get_box_name(DB, env_vars['db_path'])
+        # print (ins)
         thekeyname = 'stopped_instances'
         if aws_inst_info[x][0] == 'running':
             thekeyname = 'running_instances' 
@@ -108,7 +127,7 @@ Host {0}
 os.path.join(home_folder,'.ssh/config'))
             
     if len(ids_db - set(aws_inst_info))>0:
-        print ('this should not happen in status')
-        sys.exit()
+        raise Exception('this should not happen in status')
+        
     
     save_database(DB, env_vars['db_path'])

@@ -5,25 +5,29 @@ from colorclass import Color, Windows
 from terminaltables import SingleTable
 from provisionpad.helpers.update_status import update_status
 
-def table_server_timings(DB):
-    """Return table string to be printed."""
-    table_data = [[Color('{autogreen}Name{/autogreen}'), 'Type', 'Info']]
-    for ins, ins_val in DB['running_instances'].items():
-        table_data.append([Color('{autogreen}{0}{/autogreen}').format(ins), ins_val['type'], 'to ssh do'])
-    # table_data = [
-    #     [Color('{autogreen}<10ms{/autogreen}'), '192.168.0.100, 192.168.0.101'],
-    #     [Color('{autoyellow}10ms <= 100ms{/autoyellow}'), '192.168.0.102, 192.168.0.103'],
-    #     [Color('{autored}>100ms{/autored}'), '192.168.0.105'],
-    # ]
-    table_instance = SingleTable(table_data, 'us-east-2')
-    table_instance.inner_heading_row_border = True
-    return table_instance.table
+class StatTable:
+
+    def __init__(self, instance_status, color):
+        self.color = color
+        self.instance_status = instance_status
+
+    def stat(self, DB):
+        """Return table string to be printed."""
+        table_data = [[Color('{'+self.color+'}Name{/'+self.color+'}'), 'Type', 'SSH']]
+        for ins, ins_val in DB[self.instance_status].items():
+            table_data.append([Color('{'+self.color+'}'+ins+'{/'+self.color+'}'), 
+                                ins_val['type'], 'ssh {0}'.format(ins)])
+        table_instance = SingleTable(table_data)
+        table_instance.inner_heading_row_border = True
+        return table_instance.table
 
 def show_status(env_vars, DB):
     update_status(env_vars,DB)
-    print (DB)
-    table = table_server_timings(DB)
-    print (table)
+    # print (DB)
+    table_running = StatTable('running_instances', 'autogreen')
+    table_stopped = StatTable('stopped_instances', 'autoyellow')
+    print (table_running.stat(DB))
+    print (table_stopped.stat(DB))
 
 
 
