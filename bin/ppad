@@ -132,7 +132,7 @@ for example:
             usage='''ppad stop thename
 
 for example:
-    ppad terminate box2 
+    ppad top box2 
     the command above will stop the box2 and the associated root volume           
             
 ''')
@@ -154,8 +154,8 @@ for example:
             usage='''ppad stop thename
 
 for example:
-    ppad terminate box2 
-    the command above will stop the box2 and the associated root volume           
+    ppad start box2 
+    the command above will restart the stopped box2            
             
 ''')
 
@@ -168,6 +168,9 @@ for example:
 
 
     def stat(self):
+        '''
+        Prints out the stat of the running and stopped instances
+        '''
 
         env_vars = self.get_env_vars()
         DB = load_database(env_vars['db_path'])
