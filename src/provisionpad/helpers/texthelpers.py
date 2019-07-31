@@ -3,7 +3,7 @@ import os
 import sys
 
 def create_dir_for_file(filepath):
-    thedir = filepath.strip().rsplit('/',1)[0]
+    thedir = os.path.dirname(os.path.realpath(filepath))
     if not os.path.isdir(thedir):
         os.makedirs(thedir)
         print('dir did not exist created one')

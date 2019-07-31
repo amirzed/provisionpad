@@ -58,7 +58,7 @@ os.path.join(home_folder,'.ssh/config'))
     tmp_tclock = os.path.join(tmp_dir,'tclock.py')
     tmp_cron = os.path.join(tmp_dir,'cron')
     if not os.path.isdir(tmp_dir):
-        os.mkdir(tmp_dir  )
+        os.mkdir(tmp_dir)
     write_into_text('timeer',
 '''
 import psutil
