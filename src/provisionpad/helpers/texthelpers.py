@@ -56,7 +56,6 @@ def clean_ppad_from_file(filetodelete):
             modified_text = re.sub(pattern, '', textfile, flags=re.DOTALL)
             texttowrite = ''
             for line in modified_text.split('\n'):
-                print (line)
                 if line != '':
                     texttowrite += line+'\n'
 
