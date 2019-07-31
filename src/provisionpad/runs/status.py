@@ -4,6 +4,7 @@ from colorclass import Color, Windows
 
 from terminaltables import SingleTable
 from provisionpad.helpers.update_status import update_status
+import sys
 
 class StatTable:
 
@@ -21,13 +22,28 @@ class StatTable:
         table_instance.inner_heading_row_border = True
         return table_instance.table
 
+    def sstat(self, DB):
+        """Return table string to be printed."""
+        str_to_return = ''
+        headerl = ['Type', 'SSH']
+        theformat ="{:>15}" * (len(headerl) + 1)
+        headers = theformat.format("", *headerl)
+        str_to_return += headers
+        for ins, ins_val in DB[self.instance_status].items():
+            str_to_return += theformat.format(ins, ins_val['type'], 'ssh {0}'.format(ins))
+        return str_to_return
+
 def show_status(env_vars, DB):
     update_status(env_vars,DB)
     # print (DB)
     table_running = StatTable('running_instances', 'autogreen')
     table_stopped = StatTable('stopped_instances', 'autoyellow')
-    print (table_running.stat(DB))
-    print (table_stopped.stat(DB))
+    if sys.platform == 'win32':
+        print (table_running.sstat(DB))
+        print (table_stopped.sstat(DB))  
+    else:      
+        print (table_running.stat(DB))
+        print (table_stopped.stat(DB))
 
 
 
