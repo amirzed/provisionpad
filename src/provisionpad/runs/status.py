@@ -18,19 +18,19 @@ class StatTable:
         for ins, ins_val in DB[self.instance_status].items():
             table_data.append([Color('{'+self.color+'}'+ins+'{/'+self.color+'}'), 
                                 ins_val['type'], 'ssh {0}'.format(ins)])
-        table_instance = SingleTable(table_data)
+        table_instance = SingleTable(table_data, self.instance_status)
         table_instance.inner_heading_row_border = True
         return table_instance.table
 
     def sstat(self, DB):
         """Return table string to be printed."""
-        str_to_return = ''
-        headerl = ['Type', 'SSH']
-        theformat ="{:>15}" * (len(headerl) + 1)
-        headers = theformat.format("", *headerl)
-        str_to_return += headers
+        str_to_return  = '\n'+self.instance_status+'\n'
+        str_to_return += ' ' *len(self.instance_status) + \
+                   "{:<20} {:<20} {:<20}\n".format('Name', 'Type', 'SSH')
         for ins, ins_val in DB[self.instance_status].items():
-            str_to_return += theformat.format(ins, ins_val['type'], 'ssh {0}'.format(ins))
+            str_to_return += ' ' *len(self.instance_status) + \
+                   "{:<20} {:<20} {:<20}\n".format(ins, ins_val['type'], 'ssh {0}\n'.format(ins)) 
+        str_to_return += '\n'
         return str_to_return
 
 def show_status(env_vars, DB):
