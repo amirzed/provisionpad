@@ -4,9 +4,17 @@ from provisionpad.aws.aws_ec2 import AWSec2Funcs
 from provisionpad.db.database import load_database, save_database
 from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import delete_text_from_file
+import textwrap
 
 
 def terminate_instance(boxname, env_vars, DB):
+
+    if boxname in DB['stopped_instances']:
+        raise ValueError(textwrap.dedent('''\
+              Instance {name} is in stopped state and can not be terminated
+                          To terminate the instance you need to first start it:
+                          ppad start {name}; then you can stop it
+        '''.format(name=boxname)))
 
     region = env_vars['aws_region']
     home_folder = env_vars['HOME']
