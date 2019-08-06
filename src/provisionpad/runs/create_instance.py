@@ -46,7 +46,7 @@ def create_instance(boxname, boxtype, shut_down_time, env_vars, DB):
 '''
 Host {0}
     HostName {1}
-    User ppad
+    User ubuntu
     IdentityFile {2}
     ForwardAgent yes
     StrictHostKeyChecking no
