@@ -66,7 +66,7 @@ idle_time = psutil.cpu_times().idle
 import os
 with open('/home/ubuntu/test.file', 'w') as f:
     f.write('idle time: {0}, total_time: {1}, ratio: {2}'.format(idle_time, float({1}), idle_time/float({2})))
-if idle_time/float({0})>0.95:
+if idle_time/float({0})>0.99:
     os.system('sudo poweroff')
 '''.format(shut_down_time*60, shut_down_time*60, shut_down_time*60),
 tmp_tclock)
