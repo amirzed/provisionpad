@@ -80,9 +80,8 @@ tmp_tclock)
         towrite = '*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
         f.write(towrite.encode('UTF-8'))
 
-    print ('going to sleep')
-    time.sleep(60)
-    print ('going to wake up')
+    print ('Setting up auto power off in case of long idle time')
+    time.sleep(30)
 
     os.system('ssh {0} pip install psutil'.format(boxname))
     os.system('ssh {0} mkdir .provisionpad'.format(boxname))
