@@ -44,8 +44,7 @@ class AWSiamFuncs:
                 Description='grant full access to s3'
             )
             if not self.check_policy_exists(policy_arn, delay=2, maxattempts=3):
-                print ('something wrong')
-                sys.exit()
+                raise Exception('It seems it was not able to create the policy check your AWS permissions')
             return policy_arn
 
     def check_policy_exists(self, policy_arn, delay=1, maxattempts=1):

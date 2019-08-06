@@ -87,7 +87,6 @@ class AWSec2Funcs:
 
         # delete any instances
         for subnet in vpc.subnets.all():
-            # print (thesubnetid)
             # for instance in subnet.instances.all():
             #     instance.terminate()    
             subnet.delete()
@@ -120,7 +119,6 @@ class AWSec2Funcs:
 
     def instance_state(self, your_name):
         instance_info = self.client.describe_instances()['Reservations']
-        # print (instance_info)
         data = {}
         for x in instance_info:
             for y in x['Instances']:
@@ -169,13 +167,11 @@ class AWSec2Funcs:
     def terminate_ec2_instance(self, id):
         ids = [id,]
         instances = self.ec2.instances.filter(InstanceIds=ids).terminate()
-        # print (instances)
         # instances.wait_until_terminated()
 
     def stop_ec2_instance(self, id):
         ids = [id,]
         instances = self.ec2.instances.filter(InstanceIds=ids).stop()
-        print (instances)
         # instances.wait_until_terminated()
 
     def start_ec2_instance(self, id):
@@ -230,7 +226,6 @@ class AWSec2Funcs:
             InstanceId=params['instance_id'],
             # DryRun=True|False
         )
-        print (response)
 
     def get_volume_info(self, id):
         volume_info = self.client.describe_volumes()

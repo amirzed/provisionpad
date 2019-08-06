@@ -33,8 +33,7 @@ def delete_text_from_file(marker, filetodelete):
     create_dir_for_file(filetodelete)
     pattern = '### PROVISIONPAD {0}\n.*?\n### PROVISIONPAD'.format(marker)
     if not os.path.isfile(filetodelete):
-        print ('the file does not exists')
-        sys.exit()
+        print ('the file does not exists. Will ignore it for now') 
     else:
         with open(filetodelete, 'r') as f:
             textfile = f.read()

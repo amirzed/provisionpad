@@ -16,8 +16,7 @@ def get_box_name(DB, dbpath):
         dname = DB['available_names'].popleft()
         if dname in DB['running_instances'] or\
                 dname in DB['stopped_instances'] :
-            print ('something wrong in this function fix me')
-            sys.exit()
+            raise Exception('Was not able to find a proper name. Please report the bug')
         boxn = dname
     else:
         boxi = DB['created_instances'] + 1
