@@ -138,7 +138,7 @@ for example:
         if not boxname:
             raise NameError('You need to enter the name of the box')
 
-        # stop_instance(boxname, env_vars, DB)
+        stop_instance(boxname, env_vars, DB)
     
     def start(self):
 
