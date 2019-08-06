@@ -19,6 +19,8 @@ def create_vpc(env_vars, DB):
         return 
     elif thename not in DB:
         pass
+    elif len(vpcs)>1:
+        raise Exception('There are more than one VPCs with the name. Contact ...')
     else:
         raise Exception('Either VPC does not exists or DB has changed')
     

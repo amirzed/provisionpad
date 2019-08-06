@@ -150,8 +150,6 @@ def initiate():
         sys.exit()
 
     
-    
-
     with open(env_var_path, 'w') as f:
         json.dump(env_vars, f, indent=4)
 
