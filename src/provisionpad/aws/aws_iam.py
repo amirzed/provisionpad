@@ -57,11 +57,12 @@ class AWSiamFuncs:
                     'MaxAttempts': maxattempts
                 }
             )
-        except ClientError as e:
-            if 'not authorized' in str(e):
-                raise
-            else:
-                return False
+        except: #ClientError as e:
+            # if 'not authorized' in str(e):
+            #     raise
+            # else:
+            #     return False
+            return False
         return True
 
     def create_role_for_ec2(self, role_name):  

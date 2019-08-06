@@ -146,8 +146,7 @@ def initiate():
             awsiamf.attach_policy_to_role(env_vars['role_name'], policy)
             print ('policy attached')
     else:
-        print (' was not able to find the role')
-        sys.exit()
+        raise Exception(' was not able to find the role')
 
     
     with open(env_var_path, 'w') as f:
