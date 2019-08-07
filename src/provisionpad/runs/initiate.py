@@ -64,7 +64,7 @@ def initiate():
             env_vars['aws_region'] = 'us-east-2'
         env_vars['aws_ami'] = input ('Please enter your aws ami. If nothing entered default Ubuntu 18 will be used: ')
         if not env_vars['aws_ami']:
-            env_vars['aws_ami'] = 'ami-0d119f39f8c37cd28'  #'ami-00df714b389c23925' 
+            env_vars['aws_ami'] = 'ami-029f8374ffdc9a057'  #'ami-00df714b389c23925' 
 
         with open(input_var_path, 'w') as f:
             json.dump(env_vars, f, indent=4)
