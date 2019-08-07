@@ -63,7 +63,7 @@ os.path.join(home_folder,'.ssh/config'))
 
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    tmp_tclock = os.path.join(dir_path,'scripts/tclock.py')
+    tmp_tclock = os.path.join(dir_path,'scripts', 'tclock.py')
 
 #     write_into_text('timeer',
 # '''
@@ -80,8 +80,8 @@ os.path.join(home_folder,'.ssh/config'))
     time.sleep(30)
 
     os.system('ssh {0} pip install psutil'.format(boxname))
-    os.system('ssh {0} mkdir .provisionpad'.format(boxname))
-    os.system('ssh {0} mkdir .provisionpad/data'.format(boxname))
+    # os.system('ssh {0} mkdir .provisionpad'.format(boxname))
+    os.system('ssh {0} mkdir -p .provisionpad/data'.format(boxname))
     os.system('ssh {0} touch ~/.provisionpad/data/total_idle.out'.format(boxname))
     # os.system('ssh {0} cat "" ~/.provisionpad/data/idle_log'.format(boxname))
     os.system('scp {0} {1}:~/.provisionpad/'.format(tmp_cron, boxname))
