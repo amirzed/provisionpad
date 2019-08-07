@@ -13,7 +13,7 @@ from provisionpad.runs.create_vpc import create_vpc
 from provisionpad.runs.initiate import initiate
 from provisionpad.runs.status import show_status
 
-shut_down_time = 20
+shut_down_time = 10
 
 from argparse import RawTextHelpFormatter
 

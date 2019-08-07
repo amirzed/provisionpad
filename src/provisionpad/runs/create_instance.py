@@ -57,25 +57,44 @@ os.path.join(home_folder,'.ssh/config'))
     tmp_dir = os.path.join(env_vars['env_dir'], 'tmp')
     tmp_tclock = os.path.join(tmp_dir,'tclock.py')
     tmp_cron = os.path.join(tmp_dir,'cron')
+
     if not os.path.isdir(tmp_dir):
         os.mkdir(tmp_dir)
     write_into_text('timeer',
 '''
 import psutil
-idle_time = psutil.cpu_times().idle
+import time
 import os
-with open('/home/ubuntu/test.file', 'w') as f:
-    f.write('idle time: {0}, total_time: {1}, ratio: {2}'.format(idle_time, float({1}), idle_time/float({2})))
-if idle_time/float({0})>0.99:
-    os.system('sudo poweroff')
-'''.format(shut_down_time*60, shut_down_time*60, shut_down_time*60),
+from os.path import expanduser
+home = expanduser("~")
+total_idlef = os.path.join(home, '.provisionpad/data/total_idle.out')
+delta_idlef = os.path.join(home, '.provisionpad/data/delta_idle.out')
+idle_time = psutil.cpu_times().idle
+the_time  = time.time()
+with open(total_idlef, 'r') as f:
+    data = f.read().strip().split()
+str = '%f %f' % (idle_time, the_time)
+if len(data) != 2:
+    with open(total_idlef, 'w') as f:
+        f.write(str)
+    with open(delta_idlef, 'w') as f:
+        f.write('0\n')
+else:
+    idle_diff = (idle_time-float(data[0]))/(the_time-float(data[1]))
+    with open(total_idlef, 'w') as f:
+        f.write(str)
+    with open(delta_idlef, 'a+') as f:
+        f.write("%f\n" % idle_diff )  
+with open(delta_idlef, 'r') as f:
+    data = f.readlines()
+    # if float(data[-1])>0.97 and abs(float(data[-1])-float(data[-2]))<0.002:
+    #     os.system('sudo poweroff')
+   
+''',
 tmp_tclock)
 
-#     write_into_text('timeer',
-# '''
-# * * * * * python /home/ubuntu/.provisionpad/tclock.py
-# ''',
-# '/tmp/mycron')
+  
+
     with open(tmp_cron, 'wb') as f:
         towrite = '*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
         f.write(towrite.encode('UTF-8'))
@@ -85,6 +104,9 @@ tmp_tclock)
 
     os.system('ssh {0} pip install psutil'.format(boxname))
     os.system('ssh {0} mkdir .provisionpad'.format(boxname))
+    os.system('ssh {0} mkdir .provisionpad/data'.format(boxname))
+    os.system('ssh {0} touch ~/.provisionpad/data/total_idle.out'.format(boxname))
+    # os.system('ssh {0} cat "" ~/.provisionpad/data/idle_log'.format(boxname))
     os.system('scp {0} {1}:~/.provisionpad/'.format(tmp_cron, boxname))
     os.system('scp {0} {1}:~/.provisionpad/'.format(tmp_tclock, boxname))
     os.system('ssh {0} crontab /home/ubuntu/.provisionpad/cron'.format(boxname))
@@ -94,20 +116,3 @@ tmp_tclock)
 
 
 
-
-# if __name__ == "__main__":
-
-#     import argparse
-#     parser = argparse.ArgumentParser(description='A function to create instance', 
-#                                      usage='%(prog)s [OPTIONS]')
-#     parser.add_argument("-n", "--name", dest="boxname", default="", 
-#                         help="Enter the name of the sandbox:")
-#     parser.add_argument("-t", "--type", dest="boxtype", default="t2.micro", 
-#                         help="The type of instance. For example for ec2 t2.micro blah blah")
-#     args = parser.parse_args()
-    
-#     boxname = args.boxname
-#     boxtype = args.boxtype
-
-#     DB = load_database()
-#     create_instance(boxname, boxtype, DB)
