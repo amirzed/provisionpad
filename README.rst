@@ -46,13 +46,21 @@ If you leave them blank defaults will be used. You just need to run the command 
 
 .. code-block::
 
-    ppad initiate sandboxname sandboxtype
+    ppad create 
+   
+to create a sandbox instance with default instance type and assigned name by the code or
+
+.. code-block::
+
+    ppad create sandboxname sandboxtype
 
 for example:
 
 .. code-block::
 
-    ppad initiate boxfortest m4.large
+    ppad create boxfortest m4.large
+
+to create an instance with given name and type
 
 You can check and see how many running or stopped instances you have using:
 
