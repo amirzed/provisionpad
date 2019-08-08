@@ -22,6 +22,6 @@ else:
     with open(delta_idlef, 'a+') as f:
         f.write("%f\n" % idle_diff )  
     with open(delta_idlef, 'r') as f:
-        data = f.readlines()
+        data = f.read.splitlines()
         if float(data[-1])>0.97 and abs(float(data[-1])-float(data[-2]))<0.002:
             os.system('sudo poweroff')
