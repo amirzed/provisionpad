@@ -70,7 +70,7 @@ ppad --help
 
 ## Connecting to the Remote Host
 
-To ssh into an instance simpley use
+To ssh into an instance simply use
 
 ```
 ssh [instancename]
@@ -98,7 +98,7 @@ gradient of CPU usage is less than 0.001. *more options will be added*
 If you don't have AWS access credentials you can get them through AWS management console:
 
 - Log in to AWS management console
-- Click on user menue
+- Click on user menu
 - Click on My Security Credentials
 - Section Access keys for CLI, SDK, & API access you can create one.
 
