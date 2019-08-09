@@ -2,15 +2,15 @@
 ProvisionPad
 ************
 
-ProvisionPad is a very simple command line tool that enables 
-developers/data-scientists start secure sandboxes that can be 
-accoessed only using their personal ssh-key. (Will be configurable pretty soon to provide more options)
+ProvisionPad is a very simple command-line tool that enables 
+developers/data-scientists to start secure sandboxes that can be 
+accessed only using their personal ssh-key. (Will be configurable pretty soon to provide more options)
 
 It configures the local machine so you can connect to the remote sandbox using 
 
 `VS Code <https://code.visualstudio.com/download>`_
 
-prerequisites
+Prerequisites
 -------------
 
 You need to have your AWS Access Keys (Access Key ID and Secret Access Key).
@@ -19,8 +19,8 @@ See AWS requirements below for more information.
 Installing ProvisionPad
 -----------------------
 
-For Windows users you need to install Python first and add it to your path.
-It has been tested on Windows 10, macOS 10.14 (Mojave), and Ubuntu 18
+For Windows users, you need to install Python first and add it to your path.
+It has been tested on Windows 10, macOS 10.14 (Mojave), and Ubuntu 18.
 After that you can install it using (not added to PyPI yet):
 
 .. code-block::
@@ -32,17 +32,17 @@ After that you can install it using (not added to PyPI yet):
 Getting Started
 ---------------
 
-To initiate your sandbox environment type the following in terminal
+To initiate your sandbox environment type the following in the terminal
 
 .. code-block::
 
     ppad initiate
 
-It will ask for aws access credentials, as well 
-as the name you want to use for the environement. 
+It will ask for AWS access credentials, as well 
+as the name you want to use for the environment. 
 The name will be used for tagging the resources created on AWS. 
 You can specify an AWS image and AWS region to use or leave it blank. 
-If you leave them blank defaults will be used. You just need to run the command above only once at the begining.
+If you leave them blank defaults will be used. You just need to run the command above only once at the beginning.
 
 .. code-block::
 
@@ -94,7 +94,7 @@ For more information on commands
 
     ppad --help
 
-Conneting to the Remote Host
+Connecting to the Remote Host
 ----------------------------
 
 To ssh into the given server simple use
@@ -110,7 +110,7 @@ After installing the extension reload the Windows
 
 `Ctrl+Shift+P reload window` then 
 `Ctrl+Shift+P Remote-SSH:Connect to Host` 
-and select the instance name from the menue
+and select the instance name from the menu
 
 To access terminal on remote using VS Code simply use `Ctrl+``
 
@@ -121,13 +121,13 @@ AWS Cost Saving
 ---------------
 
 Notice that provisioned instances will stop automatically after 20 minutes 
-of low cpu activity, i.e. if the idle time percentage was over 98% and the 
-gradient of cpu usage is less than 0.001. *more options will be added to this section pretty soon*
+of low CPU activity, i.e. if the idle time percentage was over 98% and the 
+gradient of CPU usage is less than 0.001. *more options will be added to this section pretty soon*
 
 AWS requirements
 ----------------
 
-If you dont already AWS access credentials you can get it thourgh AWS management console:
+If you don't already AWS access credentials you can get it through AWS management console:
 
 - Log in to AWS management console
 - Click on user menue
