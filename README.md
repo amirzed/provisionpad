@@ -3,11 +3,10 @@
 - Start and stop EC2 instances directly from your terminal without the hassle. 
 - Use your local VS Code editor or Terminal to access, edit and run the code on EC2 instances.
 - Automatically stop inactive instances. 
-- Zero configuration needed.
 
-ProvisionPad takes care of all the little details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your terminal/editor.
+ProvisionPad takes care of all the tedious details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your Terminal/editor.
 
-<img src="https://i.ibb.co/qnXdKMm/carbon.png" />
+<img src="https://i.ibb.co/S0jD4Ld/ppad.png" />
 
 
 ## Prerequisites
@@ -71,7 +70,7 @@ ppad --help
 
 ## Connecting to the Remote Host
 
-To ssh into an instance simpley use
+To ssh into an instance simply use
 
 ```
 ssh [instancename]
@@ -99,7 +98,7 @@ gradient of CPU usage is less than 0.001. *more options will be added*
 If you don't have AWS access credentials you can get them through AWS management console:
 
 - Log in to AWS management console
-- Click on user menue
+- Click on user menu
 - Click on My Security Credentials
 - Section Access keys for CLI, SDK, & API access you can create one.
 
