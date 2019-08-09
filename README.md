@@ -3,9 +3,8 @@
 - Start and stop EC2 instances directly from your terminal without the hassle. 
 - Use your local VS Code editor or Terminal to access, edit and run the code on EC2 instances.
 - Automatically stop inactive instances. 
-- Zero configuration needed.
 
-ProvisionPad takes care of all the little details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your terminal/editor.
+ProvisionPad takes care of all the tedious details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your Terminal/editor.
 
 <img src="https://i.ibb.co/qnXdKMm/carbon.png" />
 
