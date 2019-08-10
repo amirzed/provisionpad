@@ -109,3 +109,7 @@ the following permissions (You already have these permissions if you have root a
 - AmazonEC2FullAccess 
 - IAMFullAccess 
 - AmazonVPCFullAccess 
+
+## Contributing
+
+Feel free to create issues or pull requests. More detailed guides are coming soon.
