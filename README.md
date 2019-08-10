@@ -6,7 +6,7 @@
 
 ProvisionPad takes care of all the tedious details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your Terminal/editor.
 
-<img src="https://i.ibb.co/S0jD4Ld/propad.png" />
+<img src="https://i.ibb.co/Lt6yZh8/propad.png" />
 
 
 ## Prerequisites
