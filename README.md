@@ -1,4 +1,4 @@
-# ProvisionPad [!["Join the Community"](https://img.shields.io/badge/Join%20the%20community-blueviolet.svg)](https://spectrum.chat/provisionpad/)  [!["Open Issues"](https://img.shields.io/github/issues-raw/amirzed/provisionpad.svg)](https://github.com/amirzed/provisionpad/issues)
+# ProvisionPad [![Join the Community](https://img.shields.io/badge/Join%20the%20community-blueviolet.svg)](https://spectrum.chat/provisionpad/)  [![Open Issues](https://img.shields.io/github/issues-raw/amirzed/provisionpad.svg)](https://github.com/amirzed/provisionpad/issues) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amirzed/provisionpad/blob/master/LICENSE)
 
 - Start and stop EC2 instances directly from your terminal without the hassle. 
 - Use your local VS Code editor or Terminal to access, edit and run the code on EC2 instances.
