@@ -1,12 +1,24 @@
 import os
 import sys
 import time
+import subprocess
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
 from provisionpad.db.database import load_database, save_database
 from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import write_into_text
 from provisionpad.helpers.namehelpers import get_box_name
 from provisionpad.helpers.update_status import update_status
+
+
+def run_command(cmd_list):
+    try:
+        proc = subprocess.call(cmd_list, 
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return proc.returncode    
+    except:
+        proc = subprocess.call(cmd_list, 
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return proc  
 
 def create_instance(boxname, boxtype, shut_down_time, env_vars, DB):
 
@@ -79,17 +91,27 @@ os.path.join(home_folder,'.ssh/config'))
     print ('Setting up auto power off in case of long idle time')
     time.sleep(30)
 
-    os.system('ssh {0} pip install psutil'.format(boxname))
-    # os.system('ssh {0} mkdir .provisionpad'.format(boxname))
-    os.system('ssh {0} mkdir -p .provisionpad/data'.format(boxname))
-    os.system('ssh {0} touch .provisionpad/data/total_idle.out'.format(boxname))
-    # os.system('ssh {0} cat "" ~/.provisionpad/data/idle_log'.format(boxname))
-    os.system('scp {0} {1}:~/.provisionpad/'.format(tmp_cron, boxname))
-    os.system('scp {0} {1}:~/.provisionpad/'.format(tmp_tclock, boxname))
-    os.system('ssh {0} crontab /home/ubuntu/.provisionpad/cron'.format(boxname))
-    os.remove(tmp_cron)
-    # os.remove(tmp_tclock)
 
-
-
+    out = run_command(['ssh', boxname, 'pip', 'install', 'psutil'])
+    if out != 0:
+        raise Exception('Failed to install psutil on server')
+    out = run_command(['ssh', boxname, 'mkdir', '-p', '.provisionpad/data'])
+    if out != 0:
+        raise Exception('Failed to create .provisionpad/data')
+    out = run_command(['ssh', boxname, 'touch', '.provisionpad/data/total_idle.out'])
+    if out != 0:
+        raise Exception('Failed to create .provisionpad/data/total_idle.out')    
+    out = run_command(['scp', tmp_cron, 
+                       '{0}:~/.provisionpad/'.format(boxname)])
+    if out != 0:
+        raise Exception('Failed to copy the crontab file')
+    out = run_command(['scp', tmp_tclock, 
+                       '{0}:~/.provisionpad/'.format(boxname)])
+    if out != 0:
+        raise Exception('Failed to copy the tmp_tclock')
+    out = run_command(['ssh', boxname, 'crontab', 
+                               '/home/ubuntu/.provisionpad/cron'])
+    if out != 0:
+        raise Exception('schedule a cron job') 
+    os.remove(tmp_cron)   
 
