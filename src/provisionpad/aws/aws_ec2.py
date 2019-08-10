@@ -85,10 +85,8 @@ class AWSec2Funcs:
             vpc.detach_internet_gateway(InternetGatewayId=gw.id)
             gw.delete()
 
-        # delete any instances
-        for subnet in vpc.subnets.all():
-            # for instance in subnet.instances.all():
-            #     instance.terminate()    
+        # delete subnet
+        for subnet in vpc.subnets.all():   
             subnet.delete()
  
         for rt in vpc.route_tables.all():
@@ -155,37 +153,28 @@ class AWSec2Funcs:
                             },
                         ],
                         IamInstanceProfile={
-                            # 'Arn': 'string',
                             'Name': params['aws_iam_role']
                         },
                         KeyName=params['ssh_key_name'])
 
         instances[0].wait_until_running()
-        # response = self.client.describe_instances()['Reservations']
         return self.get_instance_info(instances[0].id)
 
     def terminate_ec2_instance(self, id):
         ids = [id,]
         instances = self.ec2.instances.filter(InstanceIds=ids).terminate()
-        # instances.wait_until_terminated()
 
     def stop_ec2_instance(self, id):
         ids = [id,]
         instances = self.ec2.instances.filter(InstanceIds=ids).stop()
-        # instances.wait_until_terminated()
 
     def start_ec2_instance(self, id):
         ids = [id,]
         instances = self.ec2.instances.filter(InstanceIds=ids).start()
         self.ec2.Instance(id=id).wait_until_running()
-        # response = self.client.describe_instances()['Reservations']
         return self.get_instance_info(id)
 
     def volume_waiter(self, id, state):
-        # for i, x in enumerate(info):
-        #     if x['VolumeId'] == id:
-        #         index = i
-        #         break
         tw = 0
         while True:
             if tw > 60:

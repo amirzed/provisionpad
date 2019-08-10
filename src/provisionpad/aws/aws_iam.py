@@ -39,7 +39,6 @@ class AWSiamFuncs:
             }
             self.client.create_policy(
                 PolicyName=policy_name,
-                # Path='string',
                 PolicyDocument=json.dumps(policy_doc),
                 Description='grant full access to s3'
             )
@@ -57,11 +56,7 @@ class AWSiamFuncs:
                     'MaxAttempts': maxattempts
                 }
             )
-        except: #ClientError as e:
-            # if 'not authorized' in str(e):
-            #     raise
-            # else:
-            #     return False
+        except: 
             return False
         return True
 
@@ -100,10 +95,8 @@ class AWSiamFuncs:
     def create_instance_profile(self, name):
         instance_profile = self.iam.create_instance_profile(
             InstanceProfileName=name,
-            # Path='string'
         )
         time.sleep(1)
-        # instance_profile = self.iam.InstanceProfile(name)
         instance_profile.add_role(
             RoleName=name
         )

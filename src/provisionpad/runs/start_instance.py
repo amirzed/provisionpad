@@ -41,21 +41,3 @@ Host {0}
 os.path.join(home_folder,'.ssh/config'))
 
     print ('ec2 instance {0} started successfully'.format(boxname))
-
-# if __name__ == "__main__":
-
-#     import argparse
-#     parser = argparse.ArgumentParser(description='A function to create instance', 
-#                                      usage='%(prog)s [OPTIONS]')
-#     parser.add_argument("-n", "--name", dest="boxname", default="", 
-#                         help="Enter the name of the sandbox:")
-#     args = parser.parse_args()
-    
-#     boxname = args.boxname
-
-#     if not boxname:
-#         print('Please enter the name of the box you want to remove')
-#         sys.exit()
-
-#     DB = load_database()
-#     start_instance(boxname, DB)

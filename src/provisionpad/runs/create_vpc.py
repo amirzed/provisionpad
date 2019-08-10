@@ -26,7 +26,6 @@ def create_vpc(env_vars, DB):
     
     vpc_params = awsf.create_vpc(thename)
     vpcid = vpc_params.vpc_id
-    # vpcid = 'vpc-04757c1ab435658e8'
     if type(vpc_params.vpc_id)==type(-1):
         raise Exception('Was not able to create VPC. Check your permissions')
     elif type(vpc_params.sg_id)==type('s') and type(vpc_params.vpc_id)==type(-1):
@@ -41,5 +40,3 @@ def create_vpc(env_vars, DB):
     DB[thename]['subnet_id'] = vpc_params.subnet_id
     save_database(DB, env_vars['db_path'])
 
-# if __name__ == "__main__":
-#     create_vpc()

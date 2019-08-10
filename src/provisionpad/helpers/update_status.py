@@ -23,22 +23,18 @@ def update_status(env_vars, DB):
     clean_ppad_from_file(os.path.join(home_folder,'.ssh/config'))
 
     for ins in aws_inst_info:
-        # print (aws_inst_info[ins][0])
         if aws_inst_info[ins][0] == 'terminated':
             aws_inst_info_d.pop(ins)
         if not (aws_inst_info[ins][0] == 'stopped' or 
                 aws_inst_info[ins][0] == 'running' or
                 aws_inst_info[ins][0] == 'terminated'):
-            # print (aws_inst_info[ins][0])
             print ('try a little bit later there is a transition going on')
             sys.exit()
 
     aws_inst_info = aws_inst_info_d
 
-    # print (aws_inst_info)
     DBD = deepcopy(DB)
     for ins, ins_info in DBD['running_instances'].items():
-        # print (ins, ins_info)
         if ins_info['id'] not in aws_inst_info:
             print ('seems like the instance you have created ')
             print ('has been removed from the aws manually most likely')
@@ -70,7 +66,6 @@ os.path.join(home_folder,'.ssh/config'))
 
     DBD = deepcopy(DB)
     for ins, ins_info in DBD['stopped_instances'].items():
-        # print (ins, ins_info)
         if ins_info['id'] not in aws_inst_info:
             print ('seems like the instance you have created ')
             print ('has been removed from the aws manually most likely')
@@ -109,7 +104,6 @@ os.path.join(home_folder,'.ssh/config'))
     to_create = set(aws_inst_info) - ids_db 
     for x in to_create:
         ins = get_box_name(DB, env_vars['db_path'])
-        # print (ins)
         thekeyname = 'stopped_instances'
         if aws_inst_info[x][0] == 'running':
             thekeyname = 'running_instances' 

@@ -51,13 +51,10 @@ def create_instance(boxname, boxtype, shut_down_time, env_vars, DB):
     params['box_type'] = boxtype
     params['name'] = env_vars['your_name']+boxname
 
-    # DB[boxname] = awsf.create_ec2_instance(params)
-    # print (params)
 
     print ('wainting for confirmation from AWS')
 
     DB['running_instances'][boxname] = awsf.create_ec2_instance(params)
-    # print (DB)
     write_into_text(boxname,
 '''
 Host {0}
@@ -80,11 +77,6 @@ os.path.join(home_folder,'.ssh/config'))
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     tmp_tclock = os.path.join(dir_path,'scripts', 'tclock.py')
-
-#     write_into_text('timeer',
-# '''
-# ''',
-# tmp_tclock)
 
   
 

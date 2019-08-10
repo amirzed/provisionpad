@@ -110,7 +110,6 @@ def initiate():
                     key_pair = str(awsec2f.create_key_pair(key_pair_name))
                     print (key_pair)
                     f.write(key_pair)
-                # subprocess.call(['chmod', '0600', env_vars['key_pair_path']])
                 os.chmod(env_vars['key_pair_path'], 0o600)
             except:
                 os.remove(env_vars['key_pair_path'])

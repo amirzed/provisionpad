@@ -21,9 +21,6 @@ def write_into_text(marker, text, filetowrite):
         with open(filetowrite, 'r') as f:
             textfile = f.read()
         with open(filetowrite, 'a+') as f:
-            # if len(re.findall(pattern, textfile, flags=re.DOTALL))>0:
-            #     print('something wrong fix it (write_into_text)')
-            #     sys.exit()
             f.write(
             '\n### PROVISIONPAD {0}\n{1}\n### PROVISIONPAD\n'.format(
                 marker, text.strip())
@@ -37,9 +34,6 @@ def delete_text_from_file(marker, filetodelete):
     else:
         with open(filetodelete, 'r') as f:
             textfile = f.read()
-            # if len(re.findall(pattern, textfile, flags=re.DOTALL)) != 1:
-            #     print ('something is wrong check it')
-            #     sys.exit()
             modified_text = re.sub(pattern, '', textfile, flags=re.DOTALL)
         with open(filetodelete, 'w') as f:
             f.write(modified_text)

@@ -19,26 +19,7 @@ def stop_instance(boxname, env_vars, DB):
     awsf.stop_ec2_instance(id)
     DB['stopped_instances'][boxname] = DB['running_instances'][boxname]
     del(DB['running_instances'][boxname])
-    # DB['available_names'].append(boxname)
     save_database(DB, env_vars['db_path'])
     delete_text_from_file(boxname, os.path.join(home_folder,'.ssh/config'))
 
     print ('ec2 instance {0} stopped successfully'.format(boxname))
-
-# if __name__ == "__main__":
-
-#     import argparse
-#     parser = argparse.ArgumentParser(description='A function to create instance', 
-#                                      usage='%(prog)s [OPTIONS]')
-#     parser.add_argument("-n", "--name", dest="boxname", default="", 
-#                         help="Enter the name of the sandbox:")
-#     args = parser.parse_args()
-    
-#     boxname = args.boxname
-
-#     if not boxname:
-#         print('Please enter the name of the box you want to remove')
-#         sys.exit()
-
-#     DB = load_database()
-#     stop_instance(boxname, DB)
