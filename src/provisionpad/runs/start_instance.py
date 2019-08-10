@@ -13,6 +13,8 @@ def start_instance(boxname, env_vars, DB):
         print ('the box is not available check again:')
         sys.exit()
 
+
+    print ('wainting for confirmation from AWS')
     region = env_vars['aws_region']
     home_folder = env_vars['HOME']
     access_key = env_vars['access_key']
@@ -26,7 +28,6 @@ def start_instance(boxname, env_vars, DB):
     DB['running_instances'][boxname] = awsf.start_ec2_instance(id)
     del(DB['stopped_instances'][boxname])
     # DB['available_names'].append(boxname)
-    print (DB)
     save_database(DB, env_vars['db_path'])
     write_into_text(boxname,
 '''
@@ -38,6 +39,8 @@ Host {0}
     StrictHostKeyChecking no
 '''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path), 
 os.path.join(home_folder,'.ssh/config'))
+
+    print ('ec2 instance {0} started successfully'.format(boxname))
 
 # if __name__ == "__main__":
 

@@ -27,9 +27,10 @@ def terminate_instance(boxname, env_vars, DB):
     del(DB['running_instances'][boxname])
     if boxname[0:3] == 'box':
         DB['available_names'].append(boxname)
-    print (DB)
     save_database(DB, env_vars['db_path'])
     delete_text_from_file(boxname, os.path.join(home_folder,'.ssh/config'))
+
+    print ('ec2 instance {0} terminated successfully'.format(boxname))
 
 # if __name__ == "__main__":
 

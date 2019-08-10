@@ -8,6 +8,7 @@ from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import write_into_text
 from provisionpad.helpers.namehelpers import get_box_name
 from provisionpad.helpers.update_status import update_status
+from provisionpad.runs.status import show_status
 
 
 def run_command(cmd_list):
@@ -52,6 +53,9 @@ def create_instance(boxname, boxtype, shut_down_time, env_vars, DB):
 
     # DB[boxname] = awsf.create_ec2_instance(params)
     # print (params)
+
+    print ('wainting for confirmation from AWS')
+
     DB['running_instances'][boxname] = awsf.create_ec2_instance(params)
     # print (DB)
     write_into_text(boxname,
@@ -88,8 +92,10 @@ os.path.join(home_folder,'.ssh/config'))
         towrite = '*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
         f.write(towrite.encode('UTF-8'))
 
-    print ('Setting up auto power off in case of long idle time')
+    print ('Setting up ec2 instance')
     time.sleep(30)
+
+
 
 
     out = run_command(['ssh', boxname, 'pip', 'install', 'psutil'])
@@ -114,4 +120,7 @@ os.path.join(home_folder,'.ssh/config'))
     if out != 0:
         raise Exception('schedule a cron job') 
     os.remove(tmp_cron)   
+
+    print ('ec2 instance {} created successfully'.format(boxname))
+    show_status(env_vars, DB)
 

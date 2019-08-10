@@ -20,9 +20,10 @@ def stop_instance(boxname, env_vars, DB):
     DB['stopped_instances'][boxname] = DB['running_instances'][boxname]
     del(DB['running_instances'][boxname])
     # DB['available_names'].append(boxname)
-    print (DB)
     save_database(DB, env_vars['db_path'])
     delete_text_from_file(boxname, os.path.join(home_folder,'.ssh/config'))
+
+    print ('ec2 instance {0} stopped successfully'.format(boxname))
 
 # if __name__ == "__main__":
 
