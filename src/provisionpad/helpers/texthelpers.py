@@ -38,7 +38,7 @@ def delete_text_from_file(marker, filetodelete):
         with open(filetodelete, 'w') as f:
             f.write(modified_text)
 
-def clean_ppad_from_file(filetodelete):
+def clean_propad_from_file(filetodelete):
     create_dir_for_file(filetodelete)
     pattern = '### PROVISIONPAD.*?\n### PROVISIONPAD'
     if not os.path.isfile(filetodelete):

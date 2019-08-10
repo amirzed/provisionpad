@@ -13,7 +13,7 @@ def terminate_instance(boxname, env_vars, DB):
         raise ValueError(textwrap.dedent('''\
               Instance {name} is in stopped state and can not be terminated
                           To terminate the instance you need to first start it:
-                          ppad start {name}; then you can stop it
+                          propad start {name}; then you can stop it
         '''.format(name=boxname)))
 
     region = env_vars['aws_region']

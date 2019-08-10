@@ -63,7 +63,7 @@ The following commands are available:
 
         parser = argparse.ArgumentParser(
             description='Create a new computing instance',
-            usage='''ppad create [option]s
+            usage='''propad create [option]s
 
 If no name is provided an automatic name starting with box will be used.
 Please note you can not use names starting with box.
@@ -99,10 +99,10 @@ as the instance type qualifies for the free tier
 
         parser = argparse.ArgumentParser(
             description='Create a new computing instance',
-            usage='''ppad terminate thename
+            usage='''propad terminate thename
 
 for example:
-    ppad terminate box2 
+    propad terminate box2 
     the command above will terminate the box2 and the associated root volume           
             
 ''')
@@ -122,10 +122,10 @@ for example:
 
         parser = argparse.ArgumentParser(
             description='Create a new computing instance',
-            usage='''ppad stop thename
+            usage='''propad stop thename
 
 for example:
-    ppad top box2 
+    propad top box2 
     the command above will stop the box2 and the associated root volume           
             
 ''')
@@ -147,10 +147,10 @@ for example:
 
         parser = argparse.ArgumentParser(
             description='Create a new computing instance',
-            usage='''ppad stop thename
+            usage='''propad stop thename
 
 for example:
-    ppad start box2 
+    propad start box2 
     the command above will restart the stopped box2            
             
 ''')

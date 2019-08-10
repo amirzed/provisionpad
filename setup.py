@@ -39,11 +39,11 @@ static_setup_params = dict(
         'Development Status :: Test',
     ],
     # scripts=[
-    #     'bin/ppad',
+    #     'bin/propad',
     # ],
     entry_points={
         'console_scripts': [
-            'ppad = provisionpad.bin.ppad:main',
+            'propad = provisionpad.bin.propad:main',
         ]
     }
 )

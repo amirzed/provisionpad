@@ -35,7 +35,7 @@ def initiate():
 
     if not os.path.isfile(input_var_path):
         env_vars = {}
-        print ('Initiating a new ppad environment')
+        print ('Initiating a new propad environment')
         print ('  You can find aws access keys under user tab (top third from right)')
         print ('  My security credentials for the root info or under IAM users section')
         print ('  For more information please visit: https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html')

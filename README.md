@@ -6,7 +6,7 @@
 
 ProvisionPad takes care of all the tedious details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your Terminal/editor.
 
-<img src="https://i.ibb.co/S0jD4Ld/ppad.png" />
+<img src="https://i.ibb.co/S0jD4Ld/propad.png" />
 
 
 ## Prerequisites
@@ -31,41 +31,41 @@ pip install .
 To initiate the environment:
 
 ```
-ppad initiate
+propad initiate
 ```
 
 After initiating the environment you can create an EC2 instance using:
 
 ```
-ppad create
+propad create
 ```
 
 To stop the instance:
 ``` 
-ppad stop [instancename]   
+propad stop [instancename]   
 ```
 
 To get a list of all your running/stopped instances:
 ```
-ppad stat
+propad stat
 ```
 
 You can start a stopped instance using 
 
 ```
-ppad start [instancename]
+propad start [instancename]
 ```
 
 You can terminate a running instance using 
 
 ```
-ppad terminate [instancename]
+propad terminate [instancename]
 ```
 
 For more information on commands 
 
 ```
-ppad --help
+propad --help
 ```
 
 ## Connecting to the Remote Host

@@ -3,7 +3,7 @@ import sys
 from provisionpad.db.database import load_database, save_database
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
 from provisionpad.helpers.texthelpers import delete_text_from_file, write_into_text
-from provisionpad.helpers.texthelpers import clean_ppad_from_file
+from provisionpad.helpers.texthelpers import clean_propad_from_file
 from copy import deepcopy
 from provisionpad.helpers.namehelpers import get_box_name
 
@@ -20,7 +20,7 @@ def update_status(env_vars, DB):
     aws_inst_info = awsec2f.instance_state(env_vars['your_name'])
     aws_inst_info_d = deepcopy(aws_inst_info)
 
-    clean_ppad_from_file(os.path.join(home_folder,'.ssh/config'))
+    clean_propad_from_file(os.path.join(home_folder,'.ssh/config'))
 
     for ins in aws_inst_info:
         if aws_inst_info[ins][0] == 'terminated':
