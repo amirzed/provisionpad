@@ -13,13 +13,13 @@ from provisionpad.runs.status import show_status
 
 def run_command(cmd_list):
     try:
-        proc = subprocess.call(cmd_list, 
+        proc = subprocess.call(cmd_list,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return proc.returncode    
+        return proc.returncode
     except:
-        proc = subprocess.call(cmd_list, 
+        proc = subprocess.call(cmd_list,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return proc  
+        return proc
 
 def create_instance(boxname, boxtype, shut_down_time, env_vars, DB):
 
@@ -52,7 +52,7 @@ def create_instance(boxname, boxtype, shut_down_time, env_vars, DB):
     params['name'] = env_vars['your_name']+boxname
 
 
-    print ('wainting for confirmation from AWS')
+    print ('Waiting for confirmation from AWS')
 
     DB['running_instances'][boxname] = awsf.create_ec2_instance(params)
     write_into_text(boxname,
@@ -63,7 +63,7 @@ Host {0}
     IdentityFile {2}
     ForwardAgent yes
     StrictHostKeyChecking no
-'''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path), 
+'''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path),
 os.path.join(home_folder,'.ssh/config'))
     save_database(DB, env_vars['db_path'])
 
@@ -78,13 +78,13 @@ os.path.join(home_folder,'.ssh/config'))
     dir_path = os.path.dirname(os.path.realpath(__file__))
     tmp_tclock = os.path.join(dir_path,'scripts', 'tclock.py')
 
-  
+
 
     with open(tmp_cron, 'wb') as f:
         towrite = '*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
         f.write(towrite.encode('UTF-8'))
 
-    print ('Setting up ec2 instance')
+    print ('Setting up EC2 instance')
     time.sleep(30)
 
 
@@ -98,20 +98,20 @@ os.path.join(home_folder,'.ssh/config'))
         raise Exception('Failed to create .provisionpad/data')
     out = run_command(['ssh', boxname, 'touch', '.provisionpad/data/total_idle.out'])
     if out != 0:
-        raise Exception('Failed to create .provisionpad/data/total_idle.out')    
-    out = run_command(['scp', tmp_cron, 
+        raise Exception('Failed to create .provisionpad/data/total_idle.out')
+    out = run_command(['scp', tmp_cron,
                        '{0}:~/.provisionpad/'.format(boxname)])
     if out != 0:
         raise Exception('Failed to copy the crontab file')
-    out = run_command(['scp', tmp_tclock, 
+    out = run_command(['scp', tmp_tclock,
                        '{0}:~/.provisionpad/'.format(boxname)])
     if out != 0:
         raise Exception('Failed to copy the tmp_tclock')
-    out = run_command(['ssh', boxname, 'crontab', 
+    out = run_command(['ssh', boxname, 'crontab',
                                '/home/ubuntu/.provisionpad/cron'])
     if out != 0:
-        raise Exception('schedule a cron job') 
-    os.remove(tmp_cron)   
+        raise Exception('schedule a cron job')
+    os.remove(tmp_cron)
 
     print ('ec2 instance {} created successfully'.format(boxname))
     show_status(env_vars, DB)

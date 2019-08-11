@@ -14,14 +14,14 @@ from provisionpad.runs.create_vpc import create_vpc
 def initiate():
 
     home = os.path.expanduser("~")
-    env_dir = os.path.join(home, '.provisionpad') 
+    env_dir = os.path.join(home, '.provisionpad')
     if not os.path.isdir(env_dir):
         os.mkdir(env_dir)
     dbpath = os.path.join(env_dir, 'database.p')
     DB = load_database(dbpath)
 
     home = os.path.expanduser("~")
-    env_dir = os.path.join(home, '.provisionpad') 
+    env_dir = os.path.join(home, '.provisionpad')
     if not os.path.isdir(env_dir):
         os.mkdir(env_dir)
 
@@ -39,36 +39,34 @@ def initiate():
         print ('  You can find aws access keys under user tab (top third from right)')
         print ('  My security credentials for the root info or under IAM users section')
         print ('  For more information please visit: https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html')
-        access_key = input('Please enter your aws access key ID: ')
+        access_key = input('Enter AWS access key ID: ')
         env_vars['access_key'] = str(access_key).strip()
         if not env_vars['access_key']:
             print ('Invalid input')
             sys.exit()
-        secret_key = input('Please enter your aws secret access key: ')
+        secret_key = input('Enter AWS secret access key: ')
         env_vars['secret_key'] = str(secret_key).strip()
         if not env_vars['secret_key']:
             print ('Invalid input')
             sys.exit()
-        your_name  = input('Please enter the name you want to be associated with the env: ')
-        # env_vars['your_name'] = ''.join([x.strip().upper() for x in your_name.split(' ')] )
+        your_name  = input('Enter your name (optional, will be added as a tag to the instance): ')
         env_vars['your_name'] = re.sub('[^a-zA-Z0-9]', '', your_name).upper()
         if not env_vars['your_name']:
             print ('Invalid input')
             sys.exit()
-        env_vars['your_email'] = input('Please enter the email you want to be associated with the env: ')
-        print ('\n\n')
-        print ('NOte: AMI (Image) should be in the same defined aws region')
-        print ('Otherwise you will encounter errors later on')
-        env_vars['aws_region'] = input ('Please enter your aws region. If nothing entered us-east-2 would be used as default: ')
+        # env_vars['your_email'] = input('Enter your email (): ')
+        print ('\n')
+        print ('Note: AMI (Image) should be in the same defined AWS region.')
+        env_vars['aws_region'] = input ('Enter AWS region (us-east-2): ')
         if not env_vars['aws_region']:
             env_vars['aws_region'] = 'us-east-2'
-        env_vars['aws_ami'] = input ('Please enter your aws ami. If nothing entered default Ubuntu 18 will be used: ')
+        env_vars['aws_ami'] = input ('Enter your AWS AMI. (Ubuntu 18): ')
         if not env_vars['aws_ami']:
-            env_vars['aws_ami'] = 'ami-029f8374ffdc9a057'  #'ami-00df714b389c23925' 
+            env_vars['aws_ami'] = 'ami-029f8374ffdc9a057'  #'ami-00df714b389c23925'
 
         with open(input_var_path, 'w') as f:
             json.dump(env_vars, f, indent=4)
-    
+
     else:
 
         with open(input_var_path, 'r') as f:
@@ -78,13 +76,13 @@ def initiate():
     env_vars['env_path'] = env_var_path
     env_vars['env_dir'] = env_dir
 
-    key_pair_name = 'ec2_keypair_{0}_{1}.pem'.format(env_vars['your_name'], env_vars['aws_region']) 
+    key_pair_name = 'ec2_keypair_{0}_{1}.pem'.format(env_vars['your_name'], env_vars['aws_region'])
     key_pair_path = os.path.join(env_dir, key_pair_name)
 
     env_vars['key_pair_name'] = key_pair_name
     env_vars['key_pair_path'] = key_pair_path
 
-    env_vars['vpc_name'] = '{0}_VPC'.format(env_vars['your_name']) 
+    env_vars['vpc_name'] = '{0}_VPC'.format(env_vars['your_name'])
 
     role_name   = [env_vars['your_name'] ]
     policies = ['S3FULL']
@@ -122,7 +120,7 @@ def initiate():
     account_id = awsstsf.get_account_id()
     policy_attach = []
     for policy in env_vars['policy']:
-        policy_arn = 'arn:aws:iam::{0}:policy/{1}'.format(account_id, policy ) 
+        policy_arn = 'arn:aws:iam::{0}:policy/{1}'.format(account_id, policy )
         if not awsiamf.check_policy_exists(policy_arn):
             if policy == 'S3FULL':
                 awsiamf.ec2_policy_access_full(policy)
@@ -132,7 +130,7 @@ def initiate():
         else:
             print ('the policy {0} exists'.format(policy))
             policy_attach.append(policy_arn)
-    
+
     # # role_arn = 'arn:aws:iam::{0}:role/{1}'.format(account_id, env_vars['role_name'])
 
     if not awsiamf.check_role_exists(env_vars['role_name']):
@@ -147,10 +145,10 @@ def initiate():
     else:
         raise Exception(' was not able to find the role')
 
-    
+
     with open(env_var_path, 'w') as f:
         json.dump(env_vars, f, indent=4)
 
 
 
-     
+
