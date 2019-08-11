@@ -25,10 +25,10 @@ def update_status(env_vars, DB):
     for ins in aws_inst_info:
         if aws_inst_info[ins][0] == 'terminated':
             aws_inst_info_d.pop(ins)
-        if not (aws_inst_info[ins][0] == 'stopped' or 
+        if not (aws_inst_info[ins][0] == 'stopped' or
                 aws_inst_info[ins][0] == 'running' or
                 aws_inst_info[ins][0] == 'terminated'):
-            print ('try a little bit later there is a transition going on')
+            print ('Waiting to complete the transition. Try again a bit later.')
             sys.exit()
 
     aws_inst_info = aws_inst_info_d
@@ -46,7 +46,7 @@ def update_status(env_vars, DB):
             delete_text_from_file(ins, os.path.join(home_folder,'.ssh/config'))
         elif ins_info['id'] in aws_inst_info and aws_inst_info[ins_info['id']][0]=='stopped':
             print ('seems like the instance has been stopped')
-            print ('removing it from the running instances') 
+            print ('removing it from the running instances')
             DB['stopped_instances'][ins] = DB['running_instances'][ins]
             del(DB['running_instances'][ins])
             save_database(DB, env_vars['db_path'])
@@ -60,7 +60,7 @@ Host {0}
     IdentityFile {2}
     ForwardAgent yes
     StrictHostKeyChecking no
-'''.format(ins, DB['running_instances'][ins]['public_ip'], env_vars['key_pair_path']), 
+'''.format(ins, DB['running_instances'][ins]['public_ip'], env_vars['key_pair_path']),
 os.path.join(home_folder,'.ssh/config'))
             print ('{0} is fine as expected'.format(ins))
 
@@ -77,7 +77,7 @@ os.path.join(home_folder,'.ssh/config'))
             delete_text_from_file(ins, os.path.join(home_folder,'.ssh/config'))
         elif ins_info['id'] in aws_inst_info and aws_inst_info[ins_info['id']][0]=='running':
             print ('seems like the instance has started manually')
-            print ('moving from stopped to running') 
+            print ('moving from stopped to running')
             DB['running_instances'][ins] = DB['stopped_instances'][ins]
             DB['running_instances'][ins]['public_ip'] = aws_inst_info[ins_info['id']][1]
             del(DB['stopped_instances'][ins])
@@ -90,7 +90,7 @@ Host {0}
     IdentityFile {2}
     ForwardAgent yes
     StrictHostKeyChecking no
-'''.format(ins, DB['running_instances'][ins]['public_ip'], env_vars['key_pair_path']), 
+'''.format(ins, DB['running_instances'][ins]['public_ip'], env_vars['key_pair_path']),
 os.path.join(home_folder,'.ssh/config'))
         else:
             print ('{0} is fine as expected'.format(ins))
@@ -101,12 +101,12 @@ os.path.join(home_folder,'.ssh/config'))
     for x in DB['stopped_instances']:
         ids_db.add(DB['stopped_instances'][x]['id'])
 
-    to_create = set(aws_inst_info) - ids_db 
+    to_create = set(aws_inst_info) - ids_db
     for x in to_create:
         ins = get_box_name(DB, env_vars['db_path'])
         thekeyname = 'stopped_instances'
         if aws_inst_info[x][0] == 'running':
-            thekeyname = 'running_instances' 
+            thekeyname = 'running_instances'
         boxname = get_box_name(DB, env_vars['db_path'])
         DB[thekeyname][boxname] = awsec2f.get_instance_info(x)
         write_into_text(ins,
@@ -117,11 +117,11 @@ Host {0}
     IdentityFile {2}
     ForwardAgent yes
     StrictHostKeyChecking no
-'''.format(ins, DB[thekeyname][boxname]['public_ip'], env_vars['key_pair_path']), 
+'''.format(ins, DB[thekeyname][boxname]['public_ip'], env_vars['key_pair_path']),
 os.path.join(home_folder,'.ssh/config'))
-            
+
     if len(ids_db - set(aws_inst_info))>0:
         raise Exception('this should not happen in status')
-        
-    
+
+
     save_database(DB, env_vars['db_path'])

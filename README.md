@@ -1,8 +1,8 @@
 # ProvisionPad [![Join the Community](https://img.shields.io/badge/Join%20the%20community-blueviolet.svg)](https://spectrum.chat/provisionpad/)  [![Open Issues](https://img.shields.io/github/issues-raw/amirzed/provisionpad.svg)](https://github.com/amirzed/provisionpad/issues) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amirzed/provisionpad/blob/master/LICENSE)
 
-- Start and stop EC2 instances directly from your terminal without the hassle. 
+- Start and stop EC2 instances directly from your terminal without the hassle.
 - Use your local VS Code editor or Terminal to access, edit and run the code on EC2 instances.
-- Automatically stop inactive instances. 
+- Automatically stop inactive instances.
 
 ProvisionPad takes care of all the tedious details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your Terminal/editor.
 
@@ -41,8 +41,8 @@ propad create
 ```
 
 To stop the instance:
-``` 
-propad stop [instancename]   
+```
+propad stop [instancename]
 ```
 
 To get a list of all your running/stopped instances:
@@ -50,19 +50,19 @@ To get a list of all your running/stopped instances:
 propad stat
 ```
 
-You can start a stopped instance using 
+You can start a stopped instance using
 
 ```
 propad start [instancename]
 ```
 
-You can terminate a running instance using 
+You can terminate a running instance using
 
 ```
 propad terminate [instancename]
 ```
 
-For more information on commands 
+For more information on commands
 
 ```
 propad --help
@@ -80,8 +80,8 @@ ssh [instancename]
 ## Connecting through VS Code
 To connect to the instance using VS Code, install the [Visual Studio Code Remote Development](https://code.visualstudio.com/docs/remote/remote-overview).
 
-`Ctrl+Shift+P reload window` then 
-`Ctrl+Shift+P Remote-SSH:Connect to Host` 
+`Ctrl+Shift+P reload window` then
+`Ctrl+Shift+P Remote-SSH:Connect to Host`
 and select the instance name from the menu
 
 To access terminal on remote using VS Code simply use `Ctrl+``
@@ -89,8 +89,8 @@ To access terminal on remote using VS Code simply use `Ctrl+``
 
 ## AWS Cost Saving
 
-Instances created with ProvisionPad will stop automatically after 20 minutes 
-of low CPU activity, i.e. if the idle time percentage was over 98% and the 
+Instances created with ProvisionPad will stop automatically after 20 minutes
+of low CPU activity, i.e. if the idle time percentage was over 98% and the
 gradient of CPU usage is less than 0.001. *more options will be added*
 
 ## How to get your AWS Access Key ID and Secret Access Key
@@ -102,13 +102,13 @@ If you don't have AWS access credentials you can get them through AWS management
 - Click on My Security Credentials
 - Section Access keys for CLI, SDK, & API access you can create one.
 
-Before you can use/test this library you need to have AWS user account with 
-the following permissions (You already have these permissions if you have root access 
+Before you can use/test this library you need to have AWS user account with
+the following permissions (You already have these permissions if you have root access
 (owner) or admin access to the AWS account.):
 
-- AmazonEC2FullAccess 
-- IAMFullAccess 
-- AmazonVPCFullAccess 
+- AmazonEC2FullAccess
+- IAMFullAccess
+- AmazonVPCFullAccess
 
 ## Contributing
 

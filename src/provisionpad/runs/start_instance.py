@@ -5,7 +5,7 @@ from provisionpad.db.database import load_database, save_database
 from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import write_into_text
 
-     
+
 
 def start_instance(boxname, env_vars, DB):
 
@@ -14,7 +14,7 @@ def start_instance(boxname, env_vars, DB):
         sys.exit()
 
 
-    print ('wainting for confirmation from AWS')
+    print ('Waiting for confirmation from AWS')
     region = env_vars['aws_region']
     home_folder = env_vars['HOME']
     access_key = env_vars['access_key']
@@ -37,7 +37,7 @@ Host {0}
     IdentityFile {2}
     ForwardAgent yes
     StrictHostKeyChecking no
-'''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path), 
+'''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path),
 os.path.join(home_folder,'.ssh/config'))
 
     print ('ec2 instance {0} started successfully'.format(boxname))
