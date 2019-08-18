@@ -3,6 +3,7 @@ import sys
 import time
 import subprocess
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
+from  provisionpad.aws.aws_sg import AWSsgFuncs
 from provisionpad.db.database import load_database, save_database
 from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import write_into_text
@@ -85,6 +86,17 @@ os.path.join(home_folder,'.ssh/config'))
         f.write(towrite.encode('UTF-8'))
 
     print ('Setting up EC2 instance')
+
+    awssgf = AWSsgFuncs(region, access_key, secret_key)
+    awssgf.check_public_ip(env_vars, DB)
+    vpcparams = DB[env_vars['vpc_name'] ]
+    awssgf.revoke_sg_permissions_all(vpcparams['vpc_id'])
+    awssgf.set_sg_sshonly_local_ip(vpcparams['sg_id'], DB['public_ip'])
+    awssgf.set_sg_http_egress(vpcparams['sg_id'])
+
+    # some times it has problem ssh ing into instance
+    # I have added this 30 seconds sleep to be safe
+    # Is there a better way? -- Amir
     time.sleep(30)
 
 
@@ -112,6 +124,9 @@ os.path.join(home_folder,'.ssh/config'))
     if out != 0:
         raise Exception('schedule a cron job')
     os.remove(tmp_cron)
+
+    awssgf.revoke_sg_permissions_all(vpcparams['vpc_id'])
+    awssgf.set_sg_sshonly_local_ip(vpcparams['sg_id'], DB['public_ip'])
 
     print ('ec2 instance {} created successfully'.format(boxname))
     show_status(env_vars, DB)
