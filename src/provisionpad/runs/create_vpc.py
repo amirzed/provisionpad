@@ -13,18 +13,23 @@ def create_vpc(env_vars, DB):
     filters = [{'Name':'tag:Name', 'Values':[thename]}]
     vpcs = list(awsf.ec2.vpcs.filter(Filters=filters))
 
-    if len(vpcs)==1 and thename in DB:
+    if len(vpcs)==0:
+        pass
+    elif len(vpcs)==1 and thename in DB:
         print ('The VPC with the name: {0} exists.'.format(thename))
         print ('will continue to use it')
-        return 
+        return
     elif thename not in DB:
         pass
     elif len(vpcs)>1:
         raise Exception('There are more than one VPCs with the name. Contact ...')
     else:
         raise Exception('Either VPC does not exists or DB has changed')
-    
-    vpc_params = awsf.create_vpc(thename)
+
+    cidrblock1 = '172.16.0.0/28'
+    cidrblock2 = '172.16.0.0/28'
+
+    vpc_params = awsf.create_vpc(thename, cidrblock1, cidrblock2)
     vpcid = vpc_params.vpc_id
     if type(vpc_params.vpc_id)==type(-1):
         raise Exception('Was not able to create VPC. Check your permissions')

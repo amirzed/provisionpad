@@ -8,6 +8,7 @@ import boto3
 import textwrap
 from builtins import input
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
+from  provisionpad.aws.aws_sg import AWSsgFuncs
 from provisionpad.aws.aws_iam import AWSiamFuncs
 from provisionpad.aws.aws_sts import AWSstsFuncs
 from provisionpad.db.database import load_database, save_database
@@ -30,10 +31,6 @@ def initiate():
     env_var_path = os.path.join(env_dir, 'env_variable.json')
     input_var_path = os.path.join(env_dir, 'input_variable.json')
 
-    if os.path.isfile(env_var_path):
-        print ('the env variable file already exists')
-        print ('If no manual intteruption seems you are all set')
-        sys.exit('Exception handeling for this part will be tested later')
 
     if not os.path.isfile(input_var_path):
         env_vars = {}
@@ -109,6 +106,10 @@ def initiate():
     env_vars['role_name'] = role_names
 
     env_vars['HOME'] = home
+
+    # get the public ip address of local machine
+    DB['public_ip'] = AWSsgFuncs.get_ip_address()
+    save_database(DB, env_vars['db_path'])
 
     create_vpc(env_vars, DB)
 

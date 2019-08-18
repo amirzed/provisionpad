@@ -15,7 +15,7 @@ class AWSec2Funcs:
     def __init__(self, region, access_key, secret_key):
         self.region     = region
         self.access_key = access_key
-        self.secret_key = secret_key 
+        self.secret_key = secret_key
 
         self.ec2 = boto3.resource('ec2', region_name=region,
                                 aws_access_key_id=access_key,
@@ -25,8 +25,8 @@ class AWSec2Funcs:
                                     aws_access_key_id=access_key,
                                     aws_secret_access_key=secret_key)
 
-       
-    def create_vpc(self, thename):
+
+    def create_vpc(self, thename, cidrblock1, cidrblock2):
 
         vpctuple = namedtuple(thename, ['sg_id', 'subnet_id', 'vpc_id'])
         vpctuple.vpc_id = -1
@@ -35,33 +35,45 @@ class AWSec2Funcs:
 
         try:
             # create VPC
-            vpc = self.ec2.create_vpc(CidrBlock='172.16.0.0/16')
+            vpc = self.ec2.create_vpc(CidrBlock=cidrblock1)
             vpc.create_tags(Tags=[{'Key': 'Name', 'Value': thename}])
             vpc.wait_until_available()
 
             vpctuple.vpc_id = vpc.id
 
+            for rt in vpc.route_tables.all():
+                rt.create_tags(Tags=[{'Key': 'Name', 'Value': thename}])
+                routetable = rt
+
             # enable public dns hostname so that we can SSH into it later
-            self.client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsSupport = { 'Value': True } )
-            self.client.modify_vpc_attribute( VpcId = vpc.id , EnableDnsHostnames = { 'Value': True } )
+            self.client.modify_vpc_attribute( VpcId = vpc.id ,
+                                     EnableDnsSupport = { 'Value': True } )
+            self.client.modify_vpc_attribute( VpcId = vpc.id ,
+                                     EnableDnsHostnames = { 'Value': True } )
 
             # create an internet gateway and attach it to VPC
             internetgateway = self.ec2.create_internet_gateway()
+            time.sleep(1)
+            internetgateway.create_tags(Tags=[{'Key': 'Name', 'Value': thename}])
             vpc.attach_internet_gateway(InternetGatewayId=internetgateway.id)
 
-            # create a route table and a public route
-            routetable = vpc.create_route_table()
-            route = routetable.create_route(DestinationCidrBlock='0.0.0.0/0', GatewayId=internetgateway.id)
+            routetable.create_route(DestinationCidrBlock='0.0.0.0/0',
+                                    GatewayId=internetgateway.id)
 
             # create subnet and associate it with route table
-            subnet = self.ec2.create_subnet(CidrBlock='172.16.1.0/24', VpcId=vpc.id)
+            subnet = self.ec2.create_subnet(CidrBlock=cidrblock2, VpcId=vpc.id)
+            subnet.create_tags(Tags=[{'Key': 'Name', 'Value': thename}])
             routetable.associate_with_subnet(SubnetId=subnet.id)
 
             # Create a security group and allow SSH inbound rule through the VPC
-            securitygroup = self.ec2.create_security_group(GroupName='SSH-ONLY', Description='only allow SSH traffic', VpcId=vpc.id)
-            securitygroup.authorize_ingress(CidrIp='0.0.0.0/0', IpProtocol='tcp', FromPort=22, ToPort=22)
+            for sg in vpc.security_groups.all():
+                if sg.group_name == 'default':
+                    sg.create_tags(Tags=[{'Key': 'Name', 'Value': thename}])
+                    securitygroup = sg
 
-            
+            for acl in vpc.network_acls.all():
+                acl.create_tags(Tags=[{'Key': 'Name', 'Value': thename}])
+
             vpctuple.sg_id = securitygroup.id
             vpctuple.subnet_id = subnet.id
 
@@ -86,15 +98,15 @@ class AWSec2Funcs:
             gw.delete()
 
         # delete subnet
-        for subnet in vpc.subnets.all():   
+        for subnet in vpc.subnets.all():
             subnet.delete()
- 
+
         for rt in vpc.route_tables.all():
             try:
                 rt.delete()
             except:
                 pass
-        
+
         self.client.delete_vpc(VpcId=vpcid)
 
     def get_instance_info(self,id):
@@ -184,7 +196,7 @@ class AWSec2Funcs:
             for x in info:
                 if x['VolumeId'] == id:
                     if x['State'] == state:
-                        return 
+                        return
             time.sleep(5)
             tw += 5
 
