@@ -1,4 +1,14 @@
-# ProvisionPad [![Join the Community](https://img.shields.io/badge/Join%20the%20community-blueviolet.svg)](https://spectrum.chat/provisionpad/)  [![Open Issues](https://img.shields.io/github/issues-raw/amirzed/provisionpad.svg)](https://github.com/amirzed/provisionpad/issues) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amirzed/provisionpad/blob/master/LICENSE)
+# ProvisionPad [![Join the Community](https://img.shields.io/badge/Join%20the%20community-blueviolet.svg)](https://spectrum.chat/provisionpad/) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amirzed/provisionpad/blob/master/LICENSE)
+
+[<img src="https://www.provisionpad.com/logo.png" />](https://provisionpad.com)
+
+ProvisionPad makes it easy to create and connect to cloud instances right from your termial.
+
+This repo is open source and is one of the libraries that powers [ProvisoinPad](https://provisionpad.com). The hosted version provides advanced tools for monitoring usage and managing access to cloud resources across different teams. 
+
+Check out our [website](https://provisionpad.com) for more details and to sign up for early access.
+
+ProvisoinPad allows you to:
 
 - Start and stop EC2 instances directly from your terminal without the hassle.
 - Use your local VS Code editor or Terminal to access, edit and run the code on EC2 instances.
