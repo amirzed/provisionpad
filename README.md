@@ -1,4 +1,4 @@
-# ProvisionPad [![Join the Community](https://img.shields.io/badge/Join%20the%20community-blueviolet.svg)](https://spectrum.chat/provisionpad/) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amirzed/provisionpad/blob/master/LICENSE)
+# ProvisionPad [![Join the Community](https://img.shields.io/badge/Join%20the%20community-blueviolet.svg)](https://spectrum.chat/provisionpad/)  [![Open Issues](https://img.shields.io/github/issues-raw/provisionpad/provisionpad.svg)](https://github.com/provisionpad/provisionpad/issues) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/provisionpad/provisionpad/blob/master/LICENSE)
 
 [<img src="https://www.provisionpad.com/logo.png" />](https://provisionpad.com)
 
