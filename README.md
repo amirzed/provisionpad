@@ -8,13 +8,12 @@ This repo is open source and is one of the libraries that powers [ProvisoinPad](
 
 Check out our [website](https://provisionpad.com) for more details and to sign up for early access.
 
-ProvisoinPad allows you to:
+ProvisionPad takes care of all the tedious details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your Terminal/editor.
 
 - Start and stop EC2 instances directly from your terminal without the hassle.
 - Use your local VS Code editor or Terminal to access, edit and run the code on EC2 instances.
 - Automatically stop inactive instances.
 
-ProvisionPad takes care of all the tedious details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your Terminal/editor.
 
 <img src="https://i.ibb.co/Lt6yZh8/propad.png" />
 
