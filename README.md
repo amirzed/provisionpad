@@ -1,12 +1,12 @@
 # ProvisionPad [![Join the Community](https://img.shields.io/badge/Join%20the%20community-blueviolet.svg)](https://spectrum.chat/provisionpad/)  [![Open Issues](https://img.shields.io/github/issues-raw/provisionpad/provisionpad.svg)](https://github.com/provisionpad/provisionpad/issues) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/provisionpad/provisionpad/blob/master/LICENSE)
 
-[<img src="https://www.provisionpad.com/logo.png" />](https://provisionpad.com)
+[<img src="https://www.provisionpad.com/logo.png" />](https://provisionpad.com/?ref=github)
 
 ProvisionPad makes it easy to create and connect to cloud instances right from your termial.
 
-This repo is open source and is one of the libraries that powers [ProvisoinPad](https://provisionpad.com). The hosted version provides advanced tools for monitoring usage and managing access to cloud resources across different teams. 
+This repo is open source and is one of the libraries that powers [ProvisoinPad](https://provisionpad.com/?ref=github). The hosted version provides advanced tools for monitoring usage and managing access to cloud resources across different teams. 
 
-Check out our [website](https://provisionpad.com) for more details and to sign up for early access.
+Check out our [website](https://provisionpad.com/?ref=github) for more details and to sign up for early access.
 
 ProvisionPad takes care of all the tedious details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your Terminal/editor.
 
