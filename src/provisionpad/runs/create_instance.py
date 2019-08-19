@@ -66,6 +66,10 @@ Host {0}
     StrictHostKeyChecking no
 '''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path),
 os.path.join(home_folder,'.ssh/config'))
+
+    drivel = 'fgh'
+    DB['running_instances'][boxname]['sdrive_names'] = [(params['name']+'VOL{0}'.format(i), '/dev/xvd{0}'.format(drivel[i])) for i in range(len(drivel))]
+    DB['running_instances'][boxname]['sdrive'] = {}
     save_database(DB, env_vars['db_path'])
 
     tmp_dir = os.path.join(env_vars['env_dir'], 'tmp')
@@ -80,9 +84,10 @@ os.path.join(home_folder,'.ssh/config'))
     tmp_tclock = os.path.join(dir_path,'scripts', 'tclock.py')
 
 
-
+    # The following line is OS dependent if it changes from ubuntu to something else then
+    # It will cause trouble for auto shutdown -- Amir
     with open(tmp_cron, 'wb') as f:
-        towrite = '*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
+        towrite = '*/{0} * * * * /home/ubuntu/.pyenv/versions/3.7.2/bin/python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
         f.write(towrite.encode('UTF-8'))
 
     print ('Setting up EC2 instance')

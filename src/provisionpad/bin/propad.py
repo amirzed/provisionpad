@@ -12,9 +12,10 @@ from provisionpad.runs.start_instance import start_instance
 from provisionpad.runs.create_vpc import create_vpc
 from provisionpad.runs.initiate import initiate
 from provisionpad.runs.status import show_status
-from  provisionpad.aws.aws_sg import AWSsgFuncs
+from provisionpad.runs.attach_volume import attach_volume
+from provisionpad.aws.aws_sg import AWSsgFuncs
 
-shut_down_time = 10
+shut_down_time = 50
 
 from argparse import RawTextHelpFormatter
 
@@ -34,7 +35,7 @@ The following commands are available:
     start      :   Start an stopped instance
     stat       :   Get the information on the current workspace
     allowhttp  :   Opens http(s) egress permission for security group
-    defaultsg  :   Back to default security group
+    resolvesg  :   Back to default security group
 ''')
         parser.add_argument('command', help='Choose one of (initiate, create, terminate, stop, start, stat) to run')
         args = parser.parse_args(sys.argv[1:2])
@@ -172,6 +173,7 @@ for example:
         Prints out the stat of the running and stopped instances
         '''
 
+        self.resolvesg()
         env_vars = PPAD.get_env_vars()
         DB = load_database(env_vars['db_path'])
         show_status(env_vars, DB)
@@ -195,9 +197,10 @@ for example:
         awssgf.set_sg_sshonly_local_ip(vpcparams['sg_id'], DB['public_ip'])
         awssgf.set_sg_http_egress(vpcparams['sg_id'])
 
-    def defaultsg(self):
+    def resolvesg(self):
         '''
-        allow http access for the given box name
+        limit the access to ssh-only from local machine.
+        If you change your location then you need to update this function
         '''
 
         env_vars = PPAD.get_env_vars()
@@ -212,6 +215,44 @@ for example:
         vpcparams = DB[env_vars['vpc_name'] ]
         awssgf.revoke_sg_permissions_all(vpcparams['vpc_id'])
         awssgf.set_sg_sshonly_local_ip(vpcparams['sg_id'], DB['public_ip'])
+
+    def vol(self):
+        '''
+        attach volume to instance
+        '''
+
+        env_vars = PPAD.get_env_vars()
+        DB = load_database(env_vars['db_path'])
+
+        parser = argparse.ArgumentParser(
+            description='Attach a volume to running instance',
+            usage='''propad vol [instancename]
+
+for example:
+    propad vol box2 -s 10 -t g2
+
+''')
+
+        parser.add_argument('name', nargs='?', help='Enter the name of the box you want to terminate')
+        parser.add_argument("-s", "--volsize", type=int, dest="volumesize",
+                            help="Enter the volume size:")
+        parser.add_argument("-t", "--voltype", dest="volumetype", default="gp2",
+                            help="Enter the volume type")
+        args = parser.parse_args(sys.argv[2:])
+
+        boxname = args.name
+        if not boxname:
+            raise NameError('You need to enter the name of the box')
+        elif boxname not in DB['running_instances']:
+            raise ValueError('You can only attach a volume to running instance')
+
+        volsize = args.volumesize
+        if not volsize:
+            raise ValueError('You need to provide the volume size')
+
+        voltype = args.volumetype
+
+        attach_volume(boxname, voltype, volsize, env_vars, DB)
 
 def main():
    PPAD()

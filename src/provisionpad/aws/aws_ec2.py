@@ -174,65 +174,17 @@ class AWSec2Funcs:
 
     def terminate_ec2_instance(self, id):
         ids = [id,]
-        instances = self.ec2.instances.filter(InstanceIds=ids).terminate()
+        self.ec2.instances.filter(InstanceIds=ids).terminate()
 
     def stop_ec2_instance(self, id):
         ids = [id,]
-        instances = self.ec2.instances.filter(InstanceIds=ids).stop()
+        self.ec2.instances.filter(InstanceIds=ids).stop()
 
     def start_ec2_instance(self, id):
         ids = [id,]
-        instances = self.ec2.instances.filter(InstanceIds=ids).start()
+        self.ec2.instances.filter(InstanceIds=ids).start()
         self.ec2.Instance(id=id).wait_until_running()
         return self.get_instance_info(id)
-
-    def volume_waiter(self, id, state):
-        tw = 0
-        while True:
-            if tw > 60:
-                print ('it is taking too long to make this volume avaialable; volume waiter')
-                sys.exit()
-            info = self.client.describe_volumes()['Volumes']
-            for x in info:
-                if x['VolumeId'] == id:
-                    if x['State'] == state:
-                        return
-            time.sleep(5)
-            tw += 5
-
-    def create_volume(self, params):
-        volume = self.ec2.create_volume(
-            AvailabilityZone=params['az'],
-            # Encrypted=True|False,
-            # Iops=123,
-            # KmsKeyId='string',
-            Size=params['size'],
-            # SnapshotId='string',
-            VolumeType=params['vtype']   ,#'standard'|'io1'|'gp2'|'sc1'|'st1',
-            TagSpecifications=[
-                {
-                    'ResourceType': 'volume',
-                    'Tags': [
-                        {
-                            'Key': 'Name',
-                            'Value': params['name']
-                        },
-                    ]
-                },
-            ]
-        )
-        self.volume_waiter(volume.id, 'available')
-        response = volume.attach_to_instance(
-            Device='/dev/xvdh',
-            InstanceId=params['instance_id'],
-            # DryRun=True|False
-        )
-
-    def get_volume_info(self, id):
-        volume_info = self.client.describe_volumes()
-        print (volume_info['Volumes'][0]['Attachments'])
-        print (volume_info['Volumes'][1])
-        print (len(volume_info['Volumes']) )
 
     def create_key_pair(self, key_name):
         return self.ec2.create_key_pair(KeyName=key_name).key_material

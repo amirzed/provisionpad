@@ -16,7 +16,7 @@ class AWSsgFuncs(AWSec2Funcs):
     def check_public_ip(self, env_vars, DB):
         thepublicip = AWSsgFuncs.get_ip_address()
         if thepublicip != DB['public_ip']:
-            print ('Your public_ip has changed from {0} to {}'.format(DB['public_ip'], AWSsgFuncs.get_ip_address()))
+            print ('Your public_ip has changed from {0} to {1}'.format(DB['public_ip'], thepublicip))
             DB['public_ip'] = thepublicip
         save_database(DB, env_vars['db_path'])
 
