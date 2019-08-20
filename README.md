@@ -26,12 +26,9 @@ ProvisionPad takes care of all the tedious details of setting up secure EC2 inst
 
 
 ## Installing ProvisionPad
-*Not published to PyPi yet*
 
 ```
-git clone https://github.com/amirzed/provisionpad
-cd /path/to/cloned/directory
-pip install .
+pip install provisionpad
 ```
 
 ## Getting Started
