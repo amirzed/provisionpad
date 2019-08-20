@@ -29,7 +29,6 @@ def attach_volume(boxname, volume_type, volume_size, env_vars, DB):
     DB['running_instances'][boxname]['sdrive'][params['name']] = params
     save_database(DB, env_vars['db_path'])
 
-    print (' '.join(['ssh', boxname, 'sudo', 'mkfs', '-t', 'xfs', params['mnt']]))
     out = run_command(['ssh', boxname, 'sudo', 'mkfs', '-t', 'xfs', params['mnt']])
     drive_name = 'Project/{0}'.format(len(DB['running_instances'][boxname]['sdrive']))
     out = run_command(['ssh', boxname, 'sudo', 'mkdir', '-p', drive_name])
