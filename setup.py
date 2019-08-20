@@ -20,7 +20,7 @@ def read_file(file_name):
 
 setup (
     name='provisionpad',
-    version='0.0.2',
+    version='0.0.3',
     description='The easiest way to create and connect to secure cloud instances',
     long_description=read_file('README.md'),
     author='Amir Zainali',

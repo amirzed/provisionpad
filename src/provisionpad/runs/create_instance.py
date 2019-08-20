@@ -87,7 +87,7 @@ os.path.join(home_folder,'.ssh/config'))
     # The following line is OS dependent if it changes from ubuntu to something else then
     # It will cause trouble for auto shutdown -- Amir
     with open(tmp_cron, 'wb') as f:
-        towrite = '*/{0} * * * * /home/ubuntu/.pyenv/versions/3.7.2/bin/python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
+        towrite = '*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
         f.write(towrite.encode('UTF-8'))
 
     print ('Setting up EC2 instance')
