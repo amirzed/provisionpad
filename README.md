@@ -6,7 +6,7 @@ ProvisionPad makes it easy to create and connect to cloud instances right from y
 
 This repo is open source and is one of the libraries that powers [ProvisoinPad](https://provisionpad.com/?ref=github). The hosted version provides advanced tools for monitoring usage and managing access to cloud resources across different teams. 
 
-Check out our [website](https://provisionpad.com/?ref=github) for more details and to sign up for early access.
+Check out our [website](https://provisionpad.com/?ref=github) for more details and to sign up for Beta.
 
 ProvisionPad takes care of all the tedious details of setting up secure EC2 instances and adding proper configuration to your local machine so you can start, stop and connect to your instances directly from your Terminal/editor.
 
