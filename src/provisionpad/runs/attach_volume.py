@@ -1,61 +1,37 @@
-import os
 import sys
-from provisionpad.aws.aws_ec2 import AWSec2Funcs
+import os
+from provisionpad.aws.aws_vol import AWSvolFuncs
 from provisionpad.db.database import load_database, save_database
-from provisionpad.helpers.namehelpers import vpc_name
-from provisionpad.helpers.texthelpers import write_into_text
+from provisionpad.runs.create_instance import run_command
 
-def create_volume(box_name, volume_name, volume_type, volume_size,  DB):
+def attach_volume(boxname, volume_type, volume_size, env_vars, DB):
 
-    # if boxname not in DB['stopped_instances']:
-    #     print ('the box is not available check again:')
-    #     sys.exit()
-
-    region = os.environ['aws_region']
-    home_folder = os.environ['my_home_folder']
-    access_key = os.environ['aws_access_key_id']
-    secret_key = os.environ['aws_secret_access_key']
-    awsf = AWSec2Funcs(region, access_key, secret_key)
+    region = env_vars['aws_region']
+    access_key = env_vars['access_key']
+    secret_key = env_vars['secret_key']
+    awsf = AWSvolFuncs(region, access_key, secret_key)
 
     params = {}
-    params['az']    = DB['running_instances'][box_name]['az']
-    params['instance_id'] = DB['running_instances'][box_name]['id']
+    try:
+        nametuple = DB['running_instances'][boxname]['sdrive_names'].pop(0)
+        params['name'] = nametuple[0]
+        params['mnt']  = nametuple[1]
+    except:
+        raise Exception('Maximum number of volumes you can attach reached')
+
+    params['az']    = DB['running_instances'][boxname]['az']
+    params['instance_id'] = DB['running_instances'][boxname]['id']
     params['size']  = volume_size
     params['vtype'] = volume_type
-    params['name']  = volume_name
 
-    awsf.create_volume(params) 
-    # awsf.get_volume_info('ddd')
+    params['vol_id'] = awsf.create_volume(params)
+
+    DB['running_instances'][boxname]['sdrive'][params['name']] = params
+    save_database(DB, env_vars['db_path'])
+
+    out = run_command(['ssh', boxname, 'sudo', 'mkfs', '-t', 'xfs', params['mnt']])
+    drive_name = 'Project/{0}'.format(len(DB['running_instances'][boxname]['sdrive']))
+    out = run_command(['ssh', boxname, 'sudo', 'mkdir', '-p', drive_name])
+    out = run_command(['ssh', boxname, "echo 'sudo mount {0} ~/{1}' >> ~/.bashrc".format(params['mnt'], drive_name)])
 
 
-if __name__ == "__main__":
-
-    import argparse
-    parser = argparse.ArgumentParser(description='A function to create instance', 
-                                     usage='%(prog)s [OPTIONS]')
-    parser.add_argument("-b", "--box_name", dest="box_name", default="", 
-                        help="Enter the name of the sandbox:")
-    parser.add_argument("-n", "--volume_name", dest="volume_name", default="", 
-                        help="Enter the name of volume:")
-    parser.add_argument("-s", "--volume_size", dest="volume_size", default="", 
-                        help="Enter the volume size:")
-    parser.add_argument("-t", "--volume_type", dest="volume_type", default="gp2", 
-                        help="Enter the volume size:")
-    args = parser.parse_args()
-    
-    box_name = args.box_name
-    volume_name = args.volume_name
-    volume_size = int(args.volume_size)
-    volume_type = args.volume_type
-
-    if not box_name:
-        print('Please enter the name of the box you want to remove')
-        sys.exit()
-    if not volume_name:
-        volume_name = box_name+'VOL'
-    if not volume_size:
-        print('Please enter the size of the volume')
-        sys.exit()
-
-    DB = load_database()
-    create_volume(box_name, volume_name, volume_type, volume_size,  DB)

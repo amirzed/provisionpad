@@ -26,6 +26,7 @@ def start_instance(boxname, env_vars, DB):
 
     id = DB['stopped_instances'][boxname]['id']
     DB['running_instances'][boxname] = awsf.start_ec2_instance(id)
+    DB['running_instances'][boxname]['sdrive'] = DB['stopped_instances'][boxname]['sdrive']
     del(DB['stopped_instances'][boxname])
     # DB['available_names'].append(boxname)
     save_database(DB, env_vars['db_path'])

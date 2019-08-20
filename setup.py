@@ -11,36 +11,34 @@ except ImportError:
     print("Please install setup tools.")
     sys.exit(1)
 
-
-def read_requirements():
-    rootpath = os.path.dirname(os.path.realpath(__file__))
-    requirementPath = os.path.join(rootpath ,'requirements.txt')
-    if os.path.isfile(requirementPath):
-        with open(requirementPath) as f:
-            install_requires = f.read().splitlines()
-    return install_requires
-
-
-static_setup_params = dict(
+setup (
     name='provisionpad',
-    version='0.0.0',
-    description='Radically simple IT automation',
-    author='AZ',
-    author_email='amir.zainali@gmail.com',
-    url='to add some url',
+    version='0.0.1',
+    description='The easiest way to create and connect to secure cloud instances',
+    author='Amir Zainali',
+    author_email='provisionpad@gmail.com',
+    url='https://www.provisionpad.com/',
+    install_requires=['boto3',
+                      'python-dateutil',
+                      'future',
+                      'argcomplete',
+                      'colorclass',
+                      'terminaltables',
+                      'tzlocal',
+                      'requests'],
     project_urls={
-        'Source Code': 'https://github.com/amirzed/provisionpad',
+        'Source Code': 'https://github.com/provisionpad/provisionpad',
     },
     license='Apache-2.0',
     # python_requires='>=2.7, >=3.7',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     classifiers=[
-        'Development Status :: Test',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
     ],
-    # scripts=[
-    #     'bin/propad',
-    # ],
     entry_points={
         'console_scripts': [
             'propad = provisionpad.bin.propad:main',
@@ -48,11 +46,4 @@ static_setup_params = dict(
     }
 )
 
-def main():
-    """Invoke installation process using setuptools."""
-    setup_params = dict(static_setup_params, install_requires=read_requirements() )
-    setup(**setup_params)
-
-if __name__ == '__main__':
-    main()
 

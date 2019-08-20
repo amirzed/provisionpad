@@ -3,6 +3,7 @@ import sys
 import time
 import subprocess
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
+from  provisionpad.aws.aws_sg import AWSsgFuncs
 from provisionpad.db.database import load_database, save_database
 from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import write_into_text
@@ -65,6 +66,10 @@ Host {0}
     StrictHostKeyChecking no
 '''.format(boxname, DB['running_instances'][boxname]['public_ip'], my_ssh_key_path),
 os.path.join(home_folder,'.ssh/config'))
+
+    drivel = 'fgh'
+    DB['running_instances'][boxname]['sdrive_names'] = [(params['name']+'VOL{0}'.format(i), '/dev/xvd{0}'.format(drivel[i])) for i in range(len(drivel))]
+    DB['running_instances'][boxname]['sdrive'] = {}
     save_database(DB, env_vars['db_path'])
 
     tmp_dir = os.path.join(env_vars['env_dir'], 'tmp')
@@ -79,12 +84,24 @@ os.path.join(home_folder,'.ssh/config'))
     tmp_tclock = os.path.join(dir_path,'scripts', 'tclock.py')
 
 
-
+    # The following line is OS dependent if it changes from ubuntu to something else then
+    # It will cause trouble for auto shutdown -- Amir
     with open(tmp_cron, 'wb') as f:
-        towrite = '*/{0} * * * * python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
+        towrite = '*/{0} * * * * /home/ubuntu/.pyenv/versions/3.7.2/bin/python /home/ubuntu/.provisionpad/tclock.py\n'.format(shut_down_time)
         f.write(towrite.encode('UTF-8'))
 
     print ('Setting up EC2 instance')
+
+    awssgf = AWSsgFuncs(region, access_key, secret_key)
+    awssgf.check_public_ip(env_vars, DB)
+    vpcparams = DB[env_vars['vpc_name'] ]
+    awssgf.revoke_sg_permissions_all(vpcparams['vpc_id'])
+    awssgf.set_sg_sshonly_local_ip(vpcparams['sg_id'], DB['public_ip'])
+    awssgf.set_sg_http_egress(vpcparams['sg_id'])
+
+    # some times it has problem ssh ing into instance
+    # I have added this 30 seconds sleep to be safe
+    # Is there a better way? -- Amir
     time.sleep(30)
 
 
@@ -112,6 +129,9 @@ os.path.join(home_folder,'.ssh/config'))
     if out != 0:
         raise Exception('schedule a cron job')
     os.remove(tmp_cron)
+
+    awssgf.revoke_sg_permissions_all(vpcparams['vpc_id'])
+    awssgf.set_sg_sshonly_local_ip(vpcparams['sg_id'], DB['public_ip'])
 
     print ('ec2 instance {} created successfully'.format(boxname))
     show_status(env_vars, DB)

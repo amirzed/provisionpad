@@ -4,8 +4,11 @@ import re
 import os
 import json
 import subprocess
+import boto3
+import textwrap
 from builtins import input
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
+from  provisionpad.aws.aws_sg import AWSsgFuncs
 from provisionpad.aws.aws_iam import AWSiamFuncs
 from provisionpad.aws.aws_sts import AWSstsFuncs
 from provisionpad.db.database import load_database, save_database
@@ -28,27 +31,37 @@ def initiate():
     env_var_path = os.path.join(env_dir, 'env_variable.json')
     input_var_path = os.path.join(env_dir, 'input_variable.json')
 
-    if os.path.isfile(env_var_path):
-        print ('the env variable file already exists')
-        print ('If no manual intteruption seems you are all set')
-        sys.exit('Exception handeling for this part will be tested later')
 
     if not os.path.isfile(input_var_path):
         env_vars = {}
+        ask_for_credentials = True
         print ('Initiating a new propad environment')
-        print ('  You can find aws access keys under user tab (top third from right)')
-        print ('  My security credentials for the root info or under IAM users section')
-        print ('  For more information please visit: https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html')
-        access_key = input('Enter AWS access key ID: ')
-        env_vars['access_key'] = str(access_key).strip()
-        if not env_vars['access_key']:
-            print ('Invalid input')
-            sys.exit()
-        secret_key = input('Enter AWS secret access key: ')
-        env_vars['secret_key'] = str(secret_key).strip()
-        if not env_vars['secret_key']:
-            print ('Invalid input')
-            sys.exit()
+        print ('Searching for default AWS credentials...')
+        session = boto3.Session()
+        credentials = session.get_credentials()
+        if credentials:
+            use_default_cred = input(textwrap.dedent('''\
+                                        Default AWS credentials found.
+                                        Do you want to use them?(y/n)
+                                        '''))
+            if str(use_default_cred).strip()[0] == 'y':
+                env_vars['access_key'] = credentials.access_key
+                env_vars['secret_key'] = credentials.secret_key
+                ask_for_credentials = False
+        if ask_for_credentials:
+            print ('  You can find aws access keys under user tab (top third from right)')
+            print ('  My security credentials for the root info or under IAM users section')
+            print ('  For more information please visit: https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html')
+            access_key = input('Enter AWS access key ID: ')
+            env_vars['access_key'] = str(access_key).strip()
+            if not env_vars['access_key']:
+                print ('Invalid input')
+                sys.exit()
+            secret_key = input('Enter AWS secret access key: ')
+            env_vars['secret_key'] = str(secret_key).strip()
+            if not env_vars['secret_key']:
+                print ('Invalid input')
+                sys.exit()
         your_name  = input('Enter your name (optional, will be added as a tag to the instance): ')
         env_vars['your_name'] = re.sub('[^a-zA-Z0-9]', '', your_name).upper()
         if not env_vars['your_name']:
@@ -94,6 +107,10 @@ def initiate():
 
     env_vars['HOME'] = home
 
+    # get the public ip address of local machine
+    DB['public_ip'] = AWSsgFuncs.get_ip_address()
+    save_database(DB, env_vars['db_path'])
+
     create_vpc(env_vars, DB)
 
     awsec2f = AWSec2Funcs(env_vars['aws_region'], env_vars['access_key'], env_vars['secret_key'])
@@ -131,8 +148,6 @@ def initiate():
             print ('the policy {0} exists'.format(policy))
             policy_attach.append(policy_arn)
 
-    # # role_arn = 'arn:aws:iam::{0}:role/{1}'.format(account_id, env_vars['role_name'])
-
     if not awsiamf.check_role_exists(env_vars['role_name']):
         print (awsiamf.create_role_for_ec2(env_vars['role_name']) )
         awsiamf.create_instance_profile(env_vars['role_name'])
@@ -148,7 +163,3 @@ def initiate():
 
     with open(env_var_path, 'w') as f:
         json.dump(env_vars, f, indent=4)
-
-
-
-

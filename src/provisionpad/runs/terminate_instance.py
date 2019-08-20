@@ -1,9 +1,11 @@
 import os
 import sys
 from provisionpad.aws.aws_ec2 import AWSec2Funcs
+from provisionpad.aws.aws_vol import AWSvolFuncs
 from provisionpad.db.database import load_database, save_database
 from provisionpad.helpers.namehelpers import vpc_name
 from provisionpad.helpers.texthelpers import delete_text_from_file
+from provisionpad.runs.create_instance import run_command
 import textwrap
 
 
@@ -21,6 +23,13 @@ def terminate_instance(boxname, env_vars, DB):
     access_key = env_vars['access_key']
     secret_key = env_vars['secret_key']
     awsf = AWSec2Funcs(region, access_key, secret_key)
+    awsvolf = AWSvolFuncs(region, access_key, secret_key)
+    for _, val in DB['running_instances'][boxname]['sdrive'].items():
+        id = val['vol_id']
+        print (val['vol_id'], val['name'])
+        out = run_command(['ssh', boxname, 'umount', val['mnt']])
+        awsvolf.delete_vol(id)
+
 
     id = DB['running_instances'][boxname]['id']
     awsf.terminate_ec2_instance(id)
@@ -30,22 +39,6 @@ def terminate_instance(boxname, env_vars, DB):
     save_database(DB, env_vars['db_path'])
     delete_text_from_file(boxname, os.path.join(home_folder,'.ssh/config'))
 
+
+
     print ('ec2 instance {0} terminated successfully'.format(boxname))
-
-# if __name__ == "__main__":
-
-#     import argparse
-#     parser = argparse.ArgumentParser(description='A function to create instance', 
-#                                      usage='%(prog)s [OPTIONS]')
-#     parser.add_argument("-n", "--name", dest="boxname", default="", 
-#                         help="Enter the name of the sandbox:")
-#     args = parser.parse_args()
-    
-#     boxname = args.boxname
-
-#     if not boxname:
-#         print('Please enter the name of the box you want to remove')
-#         sys.exit()
-
-#     DB = load_database()
-#     terminate_instance(boxname, DB)
