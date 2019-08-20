@@ -11,10 +11,18 @@ except ImportError:
     print("Please install setup tools.")
     sys.exit(1)
 
+def read_file(file_name):
+    '''
+    Read a file and return stringls
+    '''
+    with open(file_name, 'r') as f:
+        return f.read()
+
 setup (
     name='provisionpad',
-    version='0.0.1',
+    version='0.0.2',
     description='The easiest way to create and connect to secure cloud instances',
+    long_description=read_file('README.md'),
     author='Amir Zainali',
     author_email='provisionpad@gmail.com',
     url='https://www.provisionpad.com/',
