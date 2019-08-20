@@ -1,6 +1,6 @@
 # ProvisionPad [![Join the Community](https://img.shields.io/badge/Join%20the%20community-blueviolet.svg)](https://spectrum.chat/provisionpad/)  [![Open Issues](https://img.shields.io/github/issues-raw/provisionpad/provisionpad.svg)](https://github.com/provisionpad/provisionpad/issues) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/provisionpad/provisionpad/blob/master/LICENSE)
 
-[<img src="https://www.provisionpad.com/logo.png" />](https://provisionpad.com/?ref=github)
+[<img src="https://i.ibb.co/88kHGrt/logo-1x.png" />](https://provisionpad.com/?ref=github)
 
 ProvisionPad makes it easy to create and connect to cloud instances right from your termial.
 
@@ -15,7 +15,7 @@ ProvisionPad takes care of all the tedious details of setting up secure EC2 inst
 - Automatically stop inactive instances.
 
 
-<img src="https://i.ibb.co/Lt6yZh8/propad.png" />
+<img src="https://i.ibb.co/KqgLQwf/terminal-border.png" />
 
 
 ## Prerequisites
