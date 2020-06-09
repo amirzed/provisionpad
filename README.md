@@ -2,7 +2,7 @@
 
 [<img src="https://i.ibb.co/88kHGrt/logo-1x.png" />](https://provisionpad.com/?ref=github)
 
-ProvisionPad makes it easy to create and connect to cloud instances right from your termial.
+ProvisionPad makes it easy to create and connect to cloud instances right from your terminal.
 
 This repo is open source and is one of the libraries that powers [ProvisoinPad](https://provisionpad.com/?ref=github). The hosted version provides advanced tools for monitoring usage and managing access to cloud resources across different teams. 
 
